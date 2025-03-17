@@ -3,7 +3,7 @@
  * API Service for communicating with the FlexiRAG backend
  */
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = 'https://custom-rag-production.up.railway.app';
 
 // User API
 export const createUser = async (userData: { name: string; email: string; phone_number?: string }) => {

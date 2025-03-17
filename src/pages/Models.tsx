@@ -11,7 +11,7 @@ import {
   Grid,
   List
 } from 'lucide-react';
-import { mockModels } from '@/data/mock-data';
+import { mockModels, mockCurrentUser } from '@/data/mock-data';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import {
@@ -38,21 +38,22 @@ const Models = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
   const handleCreateModel = () => {
-    navigate('/models/new');
+    navigate('/upload');
   };
   
-  const handleChatWithModel = (id: string) => {
-    navigate(`/chat/${id}`);
+  const handleChatWithModel = (id: string, document_id: string) => {
+    navigate(`/chat/${document_id}`);
   };
   
-  const handleEditModel = (id: string) => {
-    navigate(`/models/${id}`);
+  const handleEditModel = (id: string, document_id: string) => {
+    navigate(`/models/${document_id}`);
   };
   
-  const handleDeleteModel = (id: string) => {
+  const handleDeleteModel = (id: string, document_id: string) => {
+    // In real implementation, this would call DELETE /documents/{document_id}
     toast({
-      title: "Model deleted",
-      description: "The RAG model has been deleted successfully.",
+      title: "Document deleted",
+      description: "The RAG model and associated document have been deleted successfully.",
     });
   };
   
@@ -82,7 +83,7 @@ const Models = () => {
     <MainLayout>
       <PageHeader 
         title="RAG Models" 
-        description="Create, manage, and deploy your custom RAG models."
+        description={`Create, manage, and deploy your custom RAG models. User: ${mockCurrentUser.name}`}
       >
         <Button onClick={handleCreateModel}>
           <Plus size={16} className="mr-2" />

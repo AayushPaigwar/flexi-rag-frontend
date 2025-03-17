@@ -3,7 +3,34 @@ import { ModelCardProps } from '@/components/models/ModelCard';
 import { Message } from '@/components/chat/ChatInterface';
 import { FileItem } from '@/components/upload/FileUpload';
 
-// Mock RAG Models
+// User type to match API schema
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  phone_number?: string;
+  created_at: string;
+}
+
+// Document type to match API schema
+export interface Document {
+  id: string;
+  user_id: string;
+  file_name: string;
+  file_type: string;
+  created_at: string;
+}
+
+// Mock current user
+export const mockCurrentUser: User = {
+  id: "550e8400-e29b-41d4-a716-446655440000",
+  name: "John Doe",
+  email: "john@example.com",
+  phone_number: "+1234567890",
+  created_at: "2024-01-09T12:00:00Z"
+};
+
+// Mock RAG Models (Documents in the API)
 export const mockModels: ModelCardProps[] = [
   {
     id: '1',
@@ -13,6 +40,8 @@ export const mockModels: ModelCardProps[] = [
     sources: 12,
     updatedAt: '2 days ago',
     url: 'https://product-docs-rag.vercel.app',
+    document_id: '550e8400-e29b-41d4-a716-446655440001',
+    file_type: 'pdf'
   },
   {
     id: '2',
@@ -21,6 +50,8 @@ export const mockModels: ModelCardProps[] = [
     status: 'training',
     sources: 8,
     updatedAt: '5 hours ago',
+    document_id: '550e8400-e29b-41d4-a716-446655440002',
+    file_type: 'docx'
   },
   {
     id: '3',
@@ -29,6 +60,8 @@ export const mockModels: ModelCardProps[] = [
     status: 'draft',
     sources: 5,
     updatedAt: '1 week ago',
+    document_id: '550e8400-e29b-41d4-a716-446655440003',
+    file_type: 'pdf'
   },
   {
     id: '4',
@@ -38,6 +71,8 @@ export const mockModels: ModelCardProps[] = [
     sources: 25,
     updatedAt: '3 days ago',
     url: 'https://support-rag.vercel.app',
+    document_id: '550e8400-e29b-41d4-a716-446655440004',
+    file_type: 'txt'
   },
 ];
 

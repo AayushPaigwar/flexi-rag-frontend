@@ -3,7 +3,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, ExternalLink, Settings, MoreHorizontal } from 'lucide-react';
+import { MessageSquare, ExternalLink, Settings, MoreHorizontal, FileText, File } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,10 +21,12 @@ export interface ModelCardProps {
   sources: number;
   updatedAt: string;
   url?: string;
+  document_id: string;
+  file_type: string;
   className?: string;
-  onChat?: (id: string) => void;
-  onEdit?: (id: string) => void;
-  onDelete?: (id: string) => void;
+  onChat?: (id: string, document_id: string) => void;
+  onEdit?: (id: string, document_id: string) => void;
+  onDelete?: (id: string, document_id: string) => void;
 }
 
 export function ModelCard({
@@ -35,6 +37,8 @@ export function ModelCard({
   sources,
   updatedAt,
   url,
+  document_id,
+  file_type,
   className,
   onChat,
   onEdit,
@@ -62,11 +66,11 @@ export function ModelCard({
           <DropdownMenuContent align="end" className="w-[200px]">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onChat?.(id)}>
+            <DropdownMenuItem onClick={() => onChat?.(id, document_id)}>
               <MessageSquare className="mr-2 h-4 w-4" />
               <span>Chat</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onEdit?.(id)}>
+            <DropdownMenuItem onClick={() => onEdit?.(id, document_id)}>
               <Settings className="mr-2 h-4 w-4" />
               <span>Edit</span>
             </DropdownMenuItem>
@@ -78,7 +82,7 @@ export function ModelCard({
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem 
-              onClick={() => onDelete?.(id)}
+              onClick={() => onDelete?.(id, document_id)}
               className="text-destructive focus:text-destructive"
             >
               Delete
@@ -88,7 +92,16 @@ export function ModelCard({
       </div>
       
       <div className="flex items-center justify-between mt-4 text-sm">
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center">
+            {file_type.includes('pdf') ? (
+              <FileText className="h-4 w-4 text-red-500 mr-1" />
+            ) : (
+              <File className="h-4 w-4 text-blue-500 mr-1" />
+            )}
+            <span className="text-muted-foreground capitalize">{file_type}</span>
+          </div>
+          <span className="text-muted-foreground">•</span>
           <span className="text-muted-foreground">Sources: {sources}</span>
         </div>
         <span className="text-muted-foreground">Updated {updatedAt}</span>
@@ -99,7 +112,7 @@ export function ModelCard({
           variant="outline" 
           size="sm" 
           className="flex-1"
-          onClick={() => onChat?.(id)}
+          onClick={() => onChat?.(id, document_id)}
         >
           <MessageSquare size={16} className="mr-2" />
           Chat
@@ -119,7 +132,7 @@ export function ModelCard({
             variant="default" 
             size="sm" 
             className="flex-1"
-            onClick={() => onEdit?.(id)}
+            onClick={() => onEdit?.(id, document_id)}
           >
             <Settings size={16} className="mr-2" />
             Configure

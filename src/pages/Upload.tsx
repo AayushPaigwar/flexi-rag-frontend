@@ -4,24 +4,15 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { FileUpload, FileItem } from '@/components/upload/FileUpload';
 import { Button } from '@/components/ui/button';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { mockModels, mockUploadedFiles } from '@/data/mock-data';
 import { AlertCircle, FileText, Upload as UploadIcon } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import { mockCurrentUser, mockUploadedFiles } from '@/data/mock-data';
 
 const Upload = () => {
   const { toast } = useToast();
-  const [selectedModelId, setSelectedModelId] = useState<string>('');
   const [files, setFiles] = useState<FileItem[]>(mockUploadedFiles);
-  const [processingType, setProcessingType] = useState<string>('auto');
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
   
   const handleFilesSelected = (selectedFiles: File[]) => {
@@ -84,16 +75,9 @@ const Upload = () => {
     setFiles(prev => prev.filter(f => f.id !== fileId));
   };
   
-  const handleProcessFiles = () => {
-    if (!selectedModelId) {
-      toast({
-        title: "Model required",
-        description: "Please select a RAG model to process these files.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
+  const handleUploadFiles = () => {
+    // In a real implementation, this would call the API endpoint:
+    // POST /documents/upload/ with user_id and file
     toast({
       title: "Processing started",
       description: "Your files are being processed. This may take a few minutes."
@@ -103,8 +87,8 @@ const Upload = () => {
   return (
     <MainLayout>
       <PageHeader 
-        title="Upload Data" 
-        description="Upload documents to train or update your RAG models."
+        title="Upload Documents" 
+        description="Upload documents to create new RAG models."
       />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -114,6 +98,7 @@ const Upload = () => {
             uploadedFiles={files}
             onRemoveFile={handleRemoveFile}
             disabled={uploadInProgress}
+            acceptedFileTypes={['.pdf', '.txt', '.docx', '.csv', '.xlsx', '.xls', '.json']}
           />
           
           <div className="mt-4">
@@ -130,62 +115,35 @@ const Upload = () => {
         <div>
           <Card>
             <CardHeader>
-              <CardTitle>Processing Options</CardTitle>
+              <CardTitle>Upload Options</CardTitle>
               <CardDescription>
-                Configure how your documents will be processed.
+                Your documents will be processed for RAG.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Target RAG Model
-                </label>
-                <Select 
-                  value={selectedModelId} 
-                  onValueChange={setSelectedModelId}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mockModels.map((model) => (
-                      <SelectItem key={model.id} value={model.id}>
-                        {model.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Chunking Method
-                </label>
-                <Select
-                  value={processingType}
-                  onValueChange={setProcessingType}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="auto">Automatic (Recommended)</SelectItem>
-                    <SelectItem value="fixed">Fixed Size Chunks</SelectItem>
-                    <SelectItem value="semantic">Semantic Chunking</SelectItem>
-                    <SelectItem value="hierarchical">Hierarchical Chunking</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
               <div className="bg-muted/50 p-4 rounded-lg">
                 <h4 className="font-medium flex items-center gap-2 mb-2">
                   <FileText className="h-4 w-4" />
-                  Processing Summary
+                  Upload Summary
                 </h4>
                 <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>Files to process: {files.length}</li>
-                  <li>Estimated chunks: {files.length * 10}</li>
-                  <li>Estimated completion: ~{files.length} minute(s)</li>
+                  <li>User: {mockCurrentUser.name}</li>
+                  <li>User ID: {mockCurrentUser.id}</li>
+                  <li>Files to upload: {files.length}</li>
+                  <li>Supported formats: PDF, TXT, DOCX, CSV, XLSX, XLS, JSON</li>
+                  <li>Estimated processing time: ~{files.length} minute(s)</li>
+                </ul>
+              </div>
+              
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  After upload, your documents will be:
+                </p>
+                <ul className="text-sm list-disc list-inside text-muted-foreground mt-2">
+                  <li>Chunked into smaller sections</li>
+                  <li>Embedded using text-embedding models</li>
+                  <li>Indexed for fast retrieval</li>
+                  <li>Available for querying via chat interface</li>
                 </ul>
               </div>
             </CardContent>
@@ -193,10 +151,10 @@ const Upload = () => {
               <Button 
                 className="w-full"
                 disabled={files.length === 0 || uploadInProgress}
-                onClick={handleProcessFiles}
+                onClick={handleUploadFiles}
               >
                 <UploadIcon className="h-4 w-4 mr-2" />
-                Process Files
+                Upload Documents
               </Button>
             </CardFooter>
           </Card>

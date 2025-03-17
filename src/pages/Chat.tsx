@@ -7,6 +7,7 @@ import { mockModels, mockChatMessages } from '@/data/mock-data';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { queryDocument } from '@/services/api';
 
 const Chat = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,7 +26,7 @@ const Chat = () => {
     }
   }, [id]);
   
-  const handleSendMessage = (message: string) => {
+  const handleSendMessage = async (message: string) => {
     if (!id) return;
     
     const newUserMessage: Message = {
@@ -38,38 +39,33 @@ const Chat = () => {
     setMessages(prev => [...prev, newUserMessage]);
     setLoading(true);
     
-    // In a real implementation, this would call the API endpoint:
-    // POST /query/ with document_id and query
-    setTimeout(() => {
+    try {
+      // Use the real API call to query the document
+      const response = await queryDocument(id, message);
+      
       const responseMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: getSimulatedResponse(message),
+        content: response.answer,
         timestamp: new Date(),
       };
       
       setMessages(prev => [...prev, responseMessage]);
+    } catch (error) {
+      console.error('Error querying document:', error);
+      
+      // Show error message to user
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: "I'm sorry, I encountered an error while processing your query. Please try again later.",
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setLoading(false);
-    }, 1500);
-  };
-  
-  // Simple simulation of responses
-  const getSimulatedResponse = (message: string): string => {
-    const lowercaseMessage = message.toLowerCase();
-    
-    if (lowercaseMessage.includes('hello') || lowercaseMessage.includes('hi')) {
-      return "Hello! I'm your RAG assistant for this document. How can I help you today?";
     }
-    
-    if (lowercaseMessage.includes('feature') || lowercaseMessage.includes('capabilities')) {
-      return "This RAG platform offers several key features:\n\n• Upload custom documents (PDF, CSV, TXT, JSON, DOCX, XLSX)\n• Automatic chunking and embedding generation\n• Vector search for relevant context retrieval\n• Query processing with Gemini AI\n• Context-aware responses based on your documents";
-    }
-    
-    if (lowercaseMessage.includes('upload') || lowercaseMessage.includes('file')) {
-      return "You can upload various file types including PDF documents, CSV files, TXT files, JSON data, Word documents, and Excel spreadsheets. The system will automatically process your documents, extract text, chunk it appropriately, and generate embeddings for retrieval.";
-    }
-    
-    return "I've analyzed your query using the context from your uploaded document. Based on the information available, I can provide the following insights: [This would contain actual retrieved context in a real implementation]. Is there anything specific you'd like me to elaborate on?";
   };
   
   if (!selectedModel && id) {
@@ -87,7 +83,7 @@ const Chat = () => {
     <MainLayout>
       <PageHeader 
         title={selectedModel ? selectedModel.name : "Chat Interface"} 
-        description={selectedModel ? `Ask questions about your document: ${selectedModel.file_name || selectedModel.name}` : "Interact with your documents through natural language."}
+        description={selectedModel ? `Ask questions about your document: ${selectedModel.name}` : "Interact with your documents through natural language."}
       >
         <Button variant="outline" onClick={() => navigate('/models')}>
           <ArrowLeft size={16} className="mr-2" />

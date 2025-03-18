@@ -71,6 +71,13 @@ const CreateUser = () => {
       });
       setCurrentEmail(values.email);
       setIsVerifying(true);
+      
+      // Reset the verify form with the current email
+      verifyForm.reset({
+        email: values.email,
+        token: "",
+      });
+      
       toast({
         title: "Sign up successful",
         description: response.message || "Please check your email for OTP verification",
@@ -104,6 +111,13 @@ const CreateUser = () => {
       const response = await signInWithOtp(values.email);
       setCurrentEmail(values.email);
       setIsVerifying(true);
+      
+      // Reset the verify form with the current email
+      verifyForm.reset({
+        email: values.email,
+        token: "",
+      });
+      
       toast({
         title: "OTP sent",
         description: response.message || "Please check your email for OTP",
@@ -124,7 +138,10 @@ const CreateUser = () => {
   const onVerify = async (values: z.infer<typeof verifySchema>) => {
     setIsLoading(true);
     try {
-      const response = await verifyOtp(values.email, values.token);
+      // Make sure we're using the current email even if the form wasn't updated
+      const emailToUse = currentEmail || values.email;
+      
+      const response = await verifyOtp(emailToUse, values.token);
       
       // Store user data in localStorage
       localStorage.setItem('currentUserId', response.user.id);
@@ -270,29 +287,15 @@ const CreateUser = () => {
             <div className="space-y-6">
               <Form {...verifyForm}>
                 <form onSubmit={verifyForm.handleSubmit(onVerify)} className="space-y-6">
-                  <FormField
-                    control={verifyForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="john@example.com" 
-                            type="email" 
-                            {...field} 
-                            value={currentEmail || field.value}
-                            onChange={(e) => {
-                              setCurrentEmail(e.target.value);
-                              field.onChange(e);
-                            }}
-                            readOnly
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="space-y-2">
+                    <FormLabel>Email</FormLabel>
+                    <Input 
+                      type="email" 
+                      value={currentEmail}
+                      disabled
+                      className="bg-gray-100"
+                    />
+                  </div>
                   <FormField
                     control={verifyForm.control}
                     name="token"

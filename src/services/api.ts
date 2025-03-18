@@ -1,27 +1,19 @@
-
 /**
  * API Service for communicating with the FlexiRAG backend
  */
-
 const API_BASE_URL = 'http://localhost:8000/api/v1';
 
-// Helper function to handle API errors
 const handleApiError = async (response: Response) => {
   if (!response.ok) {
     let errorMessage = 'API request failed';
-    
     try {
-      // Try to get a detailed error message from the response
       const errorData = await response.json();
-      errorMessage = errorData.detail || errorData.message || `Error: ${response.status} ${response.statusText}`;
+      errorMessage = errorData.message || `Error: ${response.status} ${response.statusText}`;
     } catch (e) {
-      // If parsing JSON fails, use the status text
       errorMessage = `Error: ${response.status} ${response.statusText}`;
     }
-    
     throw new Error(errorMessage);
   }
-  
   return response.json();
 };
 
@@ -34,7 +26,28 @@ export const createUser = async (userData: { name: string; email: string; phone_
     },
     body: JSON.stringify(userData),
   });
-  
+  return handleApiError(response);
+};
+
+export const signInWithOtp = async (email: string) => {
+  const response = await fetch(`${API_BASE_URL}/users/signin-otp/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+  return handleApiError(response);
+};
+
+export const verifyOtp = async (email: string, token: string) => {
+  const response = await fetch(`${API_BASE_URL}/users/verify-otp/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, token }),
+  });
   return handleApiError(response);
 };
 
@@ -43,7 +56,6 @@ export const getUserDocuments = async (userId: string) => {
   return handleApiError(response);
 };
 
-// Document API
 export const uploadDocument = async (file: File, userId: string) => {
   const formData = new FormData();
   formData.append('file', file);
@@ -52,11 +64,9 @@ export const uploadDocument = async (file: File, userId: string) => {
     method: 'POST',
     body: formData,
   });
-  
   return handleApiError(response);
 };
 
-// Query API
 export const queryDocument = async (documentId: string, query: string) => {
   const response = await fetch(`${API_BASE_URL}/query/`, {
     method: 'POST',
@@ -68,17 +78,16 @@ export const queryDocument = async (documentId: string, query: string) => {
       query: query,
     }),
   });
-  
   return handleApiError(response);
 };
 
-// Types
 export interface ApiUser {
   id: string;
   name: string;
   email: string;
   phone_number?: string;
   created_at: string;
+  email_verified?: boolean;
 }
 
 export interface ApiDocument {

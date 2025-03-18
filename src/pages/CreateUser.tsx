@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -51,7 +50,6 @@ const CreateUser = () => {
     defaultValues: { email: "", token: "" },
   });
 
-  // Function to handle signup process - sends OTP to email
   const onSignup = async (values: z.infer<typeof signupSchema>) => {
     if (!values.name) {
       toast({
@@ -72,7 +70,6 @@ const CreateUser = () => {
       setCurrentEmail(values.email);
       setIsVerifying(true);
       
-      // Reset the verify form with the current email
       verifyForm.reset({
         email: values.email,
         token: "",
@@ -94,7 +91,6 @@ const CreateUser = () => {
     }
   };
 
-  // Function to request OTP for login
   const onRequestLoginOtp = async () => {
     const values = loginForm.getValues();
     if (!values.email) {
@@ -112,7 +108,6 @@ const CreateUser = () => {
       setCurrentEmail(values.email);
       setIsVerifying(true);
       
-      // Reset the verify form with the current email
       verifyForm.reset({
         email: values.email,
         token: "",
@@ -134,16 +129,14 @@ const CreateUser = () => {
     }
   };
 
-  // Function to verify OTP for either login or signup
   const onVerify = async (values: z.infer<typeof verifySchema>) => {
     setIsLoading(true);
     try {
-      // Make sure we're using the current email even if the form wasn't updated
       const emailToUse = currentEmail || values.email;
       
+      console.log("Verifying OTP with:", { email: emailToUse, token: values.token });
       const response = await verifyOtp(emailToUse, values.token);
       
-      // Store user data in localStorage
       localStorage.setItem('currentUserId', response.user.id);
       localStorage.setItem('currentUserName', response.user.name);
       localStorage.setItem('currentUserEmail', response.user.email);
@@ -153,10 +146,18 @@ const CreateUser = () => {
         description: response.message || "Email verified successfully",
       });
       
-      // Navigate to documents page for the user
       navigate(`/documents/${response.user.id}`);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to verify OTP";
+      let errorMessage = "Failed to verify OTP";
+      
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error && typeof error === 'object') {
+        errorMessage = JSON.stringify(error);
+      }
+      
+      console.error("OTP verification error:", error);
+      
       toast({
         title: "Verification failed",
         description: errorMessage,
@@ -167,7 +168,6 @@ const CreateUser = () => {
     }
   };
 
-  // Reset the verification state
   const handleBack = () => {
     setIsVerifying(false);
     verifyForm.reset();

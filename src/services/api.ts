@@ -1,4 +1,3 @@
-
 /**
  * API Service for communicating with the FlexiRAG backend
  */
@@ -20,36 +19,52 @@ const handleApiError = async (response: Response) => {
 
 // User API
 export const createUser = async (userData: { name: string; email: string; phone_number?: string }) => {
-  const response = await fetch(`${API_BASE_URL}/users/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(userData),
-  });
-  return handleApiError(response);
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    return handleApiError(response);
+  } catch (error) {
+    console.error("Create user error:", error);
+    throw error;
+  }
 };
 
 export const signInWithOtp = async (email: string) => {
-  const response = await fetch(`${API_BASE_URL}/users/signin-otp/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email }),
-  });
-  return handleApiError(response);
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/signin-otp/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+    return handleApiError(response);
+  } catch (error) {
+    console.error("Sign in OTP error:", error);
+    throw error;
+  }
 };
 
 export const verifyOtp = async (email: string, token: string) => {
-  const response = await fetch(`${API_BASE_URL}/users/verify-otp/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, token }),
-  });
-  return handleApiError(response);
+  try {
+    console.log(`Sending verify OTP request to ${API_BASE_URL}/users/verify-otp/`, { email, token });
+    const response = await fetch(`${API_BASE_URL}/users/verify-otp/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, token }),
+    });
+    return handleApiError(response);
+  } catch (error) {
+    console.error("Verify OTP error:", error);
+    throw error;
+  }
 };
 
 export const getUserDocuments = async (userId: string) => {

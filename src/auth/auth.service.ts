@@ -29,6 +29,7 @@ export class AuthService {
         message: data.message || 'OTP sent to email. Please check your inbox.'
       };
     } catch (error) {
+      console.error("Auth service signInWithOtp error:", error);
       if (error instanceof Error) {
         throw error;
       }
@@ -43,6 +44,7 @@ export class AuthService {
    */
   async verifyOtp(verifyOtpDto: { email: string; token: string }): Promise<VerifyOtpResponse> {
     try {
+      console.log("Auth service verifying OTP:", verifyOtpDto);
       const response = await fetch(`${this.API_URL}/users/verify-otp/`, {
         method: 'POST',
         headers: {
@@ -54,17 +56,19 @@ export class AuthService {
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.message || data.detail || 'Failed to verify OTP');
+        const data = await response.json();
+        throw new Error(data.message || data.detail || `Failed to verify OTP: ${response.status}`);
       }
 
+      const data = await response.json();
+      
       return {
         message: data.message || 'Email verified successfully',
         user: data.user,
       };
     } catch (error) {
+      console.error("Auth service verifyOtp error:", error);
       if (error instanceof Error) {
         throw error;
       }
@@ -74,10 +78,10 @@ export class AuthService {
 
   /**
    * Creates a new user and initiates OTP verification
-   * @param signInDto DTO containing user details
+   * @param createUserDto DTO containing user details
    * @returns AuthResponse with user data and verification message
    */
-  async createUser(signInDto: { name: string; email: string; phone_number?: string }): Promise<AuthResponse> {
+  async createUser(createUserDto: { name: string; email: string; phone_number?: string }): Promise<AuthResponse> {
     try {
       const response = await fetch(`${this.API_URL}/users/`, {
         method: 'POST',
@@ -85,9 +89,9 @@ export class AuthService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: signInDto.name,
-          email: signInDto.email,
-          phone_number: signInDto.phone_number,
+          name: createUserDto.name,
+          email: createUserDto.email,
+          phone_number: createUserDto.phone_number,
         }),
       });
 
@@ -103,6 +107,7 @@ export class AuthService {
         verification_required: data.verification_required || true,
       };
     } catch (error) {
+      console.error("Auth service createUser error:", error);
       if (error instanceof Error) {
         throw error;
       }

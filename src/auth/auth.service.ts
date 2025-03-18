@@ -1,9 +1,6 @@
 
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { SignInDto, VerifyOtpDto } from './dto/auth.dto';
 import { AuthResponse, VerifyOtpResponse } from './types/auth.types';
 
-@Injectable()
 export class AuthService {
   private readonly API_URL = 'http://localhost:8000/api/v1'; // Adjust this URL based on your backend configuration
 
@@ -12,7 +9,7 @@ export class AuthService {
    * @param signInDto DTO containing the user's email
    * @returns AuthResponse with success message
    */
-  async signInWithOtp(signInDto: SignInDto): Promise<AuthResponse> {
+  async signInWithOtp(signInDto: { email: string }): Promise<AuthResponse> {
     try {
       const response = await fetch(`${this.API_URL}/users/signin-otp/`, {
         method: 'POST',
@@ -25,17 +22,17 @@ export class AuthService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new BadRequestException(data.message || data.detail || 'Failed to send OTP');
+        throw new Error(data.message || data.detail || 'Failed to send OTP');
       }
 
       return { 
         message: data.message || 'OTP sent to email. Please check your inbox.'
       };
     } catch (error) {
-      if (error instanceof BadRequestException) {
+      if (error instanceof Error) {
         throw error;
       }
-      throw new InternalServerErrorException('Failed to send OTP. Please try again later.');
+      throw new Error('Failed to send OTP. Please try again later.');
     }
   }
 
@@ -44,7 +41,7 @@ export class AuthService {
    * @param verifyOtpDto DTO containing email and OTP token
    * @returns VerifyOtpResponse with user data and success message
    */
-  async verifyOtp(verifyOtpDto: VerifyOtpDto): Promise<VerifyOtpResponse> {
+  async verifyOtp(verifyOtpDto: { email: string; token: string }): Promise<VerifyOtpResponse> {
     try {
       const response = await fetch(`${this.API_URL}/users/verify-otp/`, {
         method: 'POST',
@@ -60,7 +57,7 @@ export class AuthService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new BadRequestException(data.message || data.detail || 'Failed to verify OTP');
+        throw new Error(data.message || data.detail || 'Failed to verify OTP');
       }
 
       return {
@@ -68,10 +65,10 @@ export class AuthService {
         user: data.user,
       };
     } catch (error) {
-      if (error instanceof BadRequestException) {
+      if (error instanceof Error) {
         throw error;
       }
-      throw new InternalServerErrorException('Failed to verify OTP. Please try again later.');
+      throw new Error('Failed to verify OTP. Please try again later.');
     }
   }
 
@@ -97,7 +94,7 @@ export class AuthService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new BadRequestException(data.message || data.detail || 'Failed to create user');
+        throw new Error(data.message || data.detail || 'Failed to create user');
       }
 
       return {
@@ -106,10 +103,10 @@ export class AuthService {
         verification_required: data.verification_required || true,
       };
     } catch (error) {
-      if (error instanceof BadRequestException) {
+      if (error instanceof Error) {
         throw error;
       }
-      throw new InternalServerErrorException('Failed to create user. Please try again later.');
+      throw new Error('Failed to create user. Please try again later.');
     }
   }
 }

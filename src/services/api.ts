@@ -3,7 +3,27 @@
  * API Service for communicating with the FlexiRAG backend
  */
 
-const API_BASE_URL = 'https://custom-rag-production.up.railway.app/api/v1';
+const API_BASE_URL = 'http://localhost:8000/api/v1';
+
+// Helper function to handle API errors
+const handleApiError = async (response: Response) => {
+  if (!response.ok) {
+    let errorMessage = 'API request failed';
+    
+    try {
+      // Try to get a detailed error message from the response
+      const errorData = await response.json();
+      errorMessage = errorData.detail || errorData.message || `Error: ${response.status} ${response.statusText}`;
+    } catch (e) {
+      // If parsing JSON fails, use the status text
+      errorMessage = `Error: ${response.status} ${response.statusText}`;
+    }
+    
+    throw new Error(errorMessage);
+  }
+  
+  return response.json();
+};
 
 // User API
 export const createUser = async (userData: { name: string; email: string; phone_number?: string }) => {
@@ -15,21 +35,12 @@ export const createUser = async (userData: { name: string; email: string; phone_
     body: JSON.stringify(userData),
   });
   
-  if (!response.ok) {
-    throw new Error('Failed to create user');
-  }
-  
-  return response.json();
+  return handleApiError(response);
 };
 
 export const getUserDocuments = async (userId: string) => {
   const response = await fetch(`${API_BASE_URL}/users/${userId}/documents`);
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch user documents');
-  }
-  
-  return response.json();
+  return handleApiError(response);
 };
 
 // Document API
@@ -42,11 +53,7 @@ export const uploadDocument = async (file: File, userId: string) => {
     body: formData,
   });
   
-  if (!response.ok) {
-    throw new Error('Failed to upload document');
-  }
-  
-  return response.json();
+  return handleApiError(response);
 };
 
 // Query API
@@ -62,11 +69,7 @@ export const queryDocument = async (documentId: string, query: string) => {
     }),
   });
   
-  if (!response.ok) {
-    throw new Error('Failed to query document');
-  }
-  
-  return response.json();
+  return handleApiError(response);
 };
 
 // Types

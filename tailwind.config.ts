@@ -69,6 +69,11 @@ export default {
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
 			},
+			fontFamily: {
+				sans: ['DM Sans', 'system-ui', 'sans-serif'],
+				display: ['DM Sans', 'system-ui', 'sans-serif'],
+				rounded: ['DM Sans', 'system-ui', 'sans-serif']
+			},
 			keyframes: {
 				'accordion-down': {
 					from: { height: '0' },
@@ -132,11 +137,6 @@ export default {
 				'blur-xl': 'blur(24px)',
 				'blur-2xl': 'blur(40px)',
 				'blur-3xl': 'blur(64px)',
-			},
-			fontFamily: {
-				sans: ['var(--font-sf-pro)', 'system-ui', 'sans-serif'],
-				display: ['var(--font-sf-pro-display)', 'system-ui', 'sans-serif'],
-				rounded: ['var(--font-sf-pro-rounded)', 'system-ui', 'sans-serif']
 			}
 		}
 	},

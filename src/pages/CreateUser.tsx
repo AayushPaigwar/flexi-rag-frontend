@@ -62,9 +62,18 @@ const CreateUser = () => {
       localStorage.setItem('currentUserEmail', user.email);
       navigate(`/documents/${user.id}`);
     } catch (error) {
+      console.error("Error creating user:", error);
+      // Extract error message from API response if available
+      let errorMessage = "An unknown error occurred";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error instanceof Response) {
+        errorMessage = `Server error: ${error.status}`;
+      }
+      
       toast({
         title: "Failed to create user",
-        description: error instanceof Error ? error.message : "An unknown error occurred",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -90,9 +99,15 @@ const CreateUser = () => {
       
       navigate(`/documents/${userId}`);
     } catch (error) {
+      console.error("Login error:", error);
+      let errorMessage = "There was an error logging in";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Login failed",
-        description: "There was an error logging in. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }

@@ -1,3 +1,4 @@
+
 /**
  * API Service for communicating with the FlexiRAG backend
  */
@@ -8,7 +9,7 @@ const handleApiError = async (response: Response) => {
     let errorMessage = 'API request failed';
     try {
       const errorData = await response.json();
-      errorMessage = errorData.message || `Error: ${response.status} ${response.statusText}`;
+      errorMessage = errorData.message || errorData.detail || `Error: ${response.status} ${response.statusText}`;
     } catch (e) {
       errorMessage = `Error: ${response.status} ${response.statusText}`;
     }

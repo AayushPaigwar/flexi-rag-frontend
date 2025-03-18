@@ -1,3 +1,4 @@
+
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SignInDto, VerifyOtpDto } from './dto/auth.dto';
 import { AuthResponse, VerifyOtpResponse } from './types/auth.types';
@@ -24,7 +25,7 @@ export class AuthService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new BadRequestException(data.message || 'Failed to send OTP');
+        throw new BadRequestException(data.message || data.detail || 'Failed to send OTP');
       }
 
       return { 
@@ -59,7 +60,7 @@ export class AuthService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new BadRequestException(data.message || 'Failed to verify OTP');
+        throw new BadRequestException(data.message || data.detail || 'Failed to verify OTP');
       }
 
       return {
@@ -96,7 +97,7 @@ export class AuthService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new BadRequestException(data.message || 'Failed to create user');
+        throw new BadRequestException(data.message || data.detail || 'Failed to create user');
       }
 
       return {

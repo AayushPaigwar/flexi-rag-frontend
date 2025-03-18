@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -6,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
 import { createUser, signInWithOtp, verifyOtp } from '@/services/api';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Key, Mail, UserPlus } from 'lucide-react';
+import { Key, Loader, Mail, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
@@ -30,8 +31,10 @@ const verifySchema = z.object({
 const CreateUser = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('');
+  const [activeTab, setActiveTab] = useState('login');
 
   const signupForm = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -48,7 +51,18 @@ const CreateUser = () => {
     defaultValues: { email: "", token: "" },
   });
 
+  // Function to handle signup process - sends OTP to email
   const onSignup = async (values: z.infer<typeof signupSchema>) => {
+    if (!values.name) {
+      toast({
+        title: "Error",
+        description: "Name is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const response = await createUser({
         name: values.name,
@@ -68,10 +82,24 @@ const CreateUser = () => {
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const onLogin = async (values: z.infer<typeof loginSchema>) => {
+  // Function to request OTP for login
+  const onRequestLoginOtp = async () => {
+    const values = loginForm.getValues();
+    if (!values.email) {
+      toast({
+        title: "Error",
+        description: "Email is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const response = await signInWithOtp(values.email);
       setCurrentEmail(values.email);
@@ -87,19 +115,28 @@ const CreateUser = () => {
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Function to verify OTP for either login or signup
   const onVerify = async (values: z.infer<typeof verifySchema>) => {
+    setIsLoading(true);
     try {
       const response = await verifyOtp(values.email, values.token);
+      
+      // Store user data in localStorage
       localStorage.setItem('currentUserId', response.user.id);
       localStorage.setItem('currentUserName', response.user.name);
       localStorage.setItem('currentUserEmail', response.user.email);
+      
       toast({
         title: "Verification successful",
         description: response.message || "Email verified successfully",
       });
+      
+      // Navigate to documents page for the user
       navigate(`/documents/${response.user.id}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to verify OTP";
@@ -108,7 +145,15 @@ const CreateUser = () => {
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  // Reset the verification state
+  const handleBack = () => {
+    setIsVerifying(false);
+    verifyForm.reset();
   };
 
   return (
@@ -117,12 +162,14 @@ const CreateUser = () => {
         <CardHeader>
           <CardTitle>FlexiRAG Platform</CardTitle>
           <CardDescription>
-            Create a profile or login to start using the FlexiRAG platform
+            {!isVerifying 
+              ? "Create a profile or login to start using the FlexiRAG platform"
+              : "Enter the OTP sent to your email"}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {!isVerifying ? (
-            <Tabs defaultValue="login" className="w-full">
+            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -130,7 +177,7 @@ const CreateUser = () => {
 
               <TabsContent value="login">
                 <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-6">
+                  <form className="space-y-6">
                     <FormField
                       control={loginForm.control}
                       name="email"
@@ -144,8 +191,18 @@ const CreateUser = () => {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      <Mail className="mr-2 h-4 w-4" /> Login with Email
+                    <Button 
+                      type="button" 
+                      className="w-full" 
+                      onClick={onRequestLoginOtp}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Mail className="mr-2 h-4 w-4" />
+                      )}
+                      {isLoading ? "Sending OTP..." : "Send OTP to Email"}
                     </Button>
                   </form>
                 </Form>
@@ -193,52 +250,87 @@ const CreateUser = () => {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      <UserPlus className="mr-2 h-4 w-4" /> Create Profile
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <UserPlus className="mr-2 h-4 w-4" />
+                      )}
+                      {isLoading ? "Processing..." : "Create Profile"}
                     </Button>
                   </form>
                 </Form>
               </TabsContent>
             </Tabs>
           ) : (
-            <Form {...verifyForm}>
-              <form onSubmit={verifyForm.handleSubmit(onVerify)} className="space-y-6">
-                <FormField
-                  control={verifyForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="john@example.com" 
-                          type="email" 
-                          {...field} 
-                          defaultValue={currentEmail}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={verifyForm.control}
-                  name="token"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>OTP Code</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter OTP" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  <Key className="mr-2 h-4 w-4" /> Verify OTP
-                </Button>
-              </form>
-            </Form>
+            <div className="space-y-6">
+              <Form {...verifyForm}>
+                <form onSubmit={verifyForm.handleSubmit(onVerify)} className="space-y-6">
+                  <FormField
+                    control={verifyForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="john@example.com" 
+                            type="email" 
+                            {...field} 
+                            value={currentEmail || field.value}
+                            onChange={(e) => {
+                              setCurrentEmail(e.target.value);
+                              field.onChange(e);
+                            }}
+                            readOnly
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={verifyForm.control}
+                    name="token"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>OTP Code</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter OTP" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex space-x-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={handleBack}
+                      className="flex-1"
+                    >
+                      Back
+                    </Button>
+                    <Button 
+                      type="submit" 
+                      className="flex-1"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Key className="mr-2 h-4 w-4" />
+                      )}
+                      {isLoading ? "Verifying..." : "Verify OTP"}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </div>
           )}
         </CardContent>
         <CardFooter className="flex justify-center text-sm text-muted-foreground">

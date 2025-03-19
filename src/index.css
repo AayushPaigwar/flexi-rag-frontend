@@ -76,3 +76,10 @@
     font-family: 'DM Sans', sans-serif;
   }
 }
+
+@layer utilities {
+  .overflow-wrap-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}

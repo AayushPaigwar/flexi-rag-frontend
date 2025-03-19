@@ -1,4 +1,3 @@
-
 /**
  * API Service for communicating with the FlexiRAG backend
  */
@@ -37,6 +36,11 @@ export const createUser = async (userData: { name: string; email: string; phone_
 
 export const signInWithOtp = async (email: string) => {
   try {
+    if (!email || !email.includes('@')) {
+      throw new Error("Invalid email address provided.");
+    }
+
+    console.log(`Sending sign-in OTP request with email: ${email}`);
     const response = await fetch(`${API_BASE_URL}/users/signin-otp/`, {
       method: 'POST',
       headers: {
@@ -44,6 +48,7 @@ export const signInWithOtp = async (email: string) => {
       },
       body: JSON.stringify({ email }),
     });
+
     return handleApiError(response);
   } catch (error) {
     console.error("Sign in OTP error:", error);
@@ -53,14 +58,15 @@ export const signInWithOtp = async (email: string) => {
 
 export const verifyOtp = async (email: string, token: string) => {
   try {
-    console.log(`Sending verify OTP request to ${API_BASE_URL}/users/verify-otp/`, { email, token });
+    console.log(`Sending verify OTP request with body:`, { email, token });
     const response = await fetch(`${API_BASE_URL}/users/verify-otp/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, token }),
+      body: JSON.stringify({ email, token }), // Pass email and token in the body
     });
+
     return handleApiError(response);
   } catch (error) {
     console.error("Verify OTP error:", error);
@@ -70,12 +76,16 @@ export const verifyOtp = async (email: string, token: string) => {
 
 export const logoutUser = async (email: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/logout/?email=${encodeURIComponent(email)}`, {
-      method: 'GET',
+    const response = await fetch(`${API_BASE_URL}/users/logout/`, {
+      method: 'POST', // Changed from GET to POST
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ email }), // Include email in the request body
     });
+
+    console.log(`logout Button Reseponse: ${response}`);
+    
     return handleApiError(response);
   } catch (error) {
     console.error("Logout user error:", error);

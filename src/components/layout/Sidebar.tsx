@@ -1,25 +1,22 @@
-
-import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Database, 
-  Settings, 
-  Server, 
-  MessageSquare, 
-  Code, 
-  Upload, 
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+import {
+  ChevronRight,
+  Code,
+  FileText,
+  LayoutDashboard,
   LogOut,
   Menu,
-  X,
-  ChevronRight,
-  User,
-  FileText
+  MessageSquare,
+  Server,
+  Settings,
+  Upload,
+  User
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { logoutUser } from '@/services/api';
-import { useToast } from '@/hooks/use-toast';
+import React, { useEffect, useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   className?: string;
@@ -47,43 +44,17 @@ export function Sidebar({ className }: SidebarProps) {
     setExpanded(!expanded);
   };
 
-  const handleLogout = async () => {
-    if (!userEmail) {
-      toast({
-        title: "Error",
-        description: "User email not found",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('currentUserId');
+    localStorage.removeItem('currentUserName');
+    localStorage.removeItem('currentUserEmail');
 
-    try {
-      await logoutUser(userEmail);
-      
-      // Clear local storage
-      localStorage.removeItem('currentUserId');
-      localStorage.removeItem('currentUserName');
-      localStorage.removeItem('currentUserEmail');
-      
-      toast({
-        title: "Success",
-        description: "Logged out successfully",
-      });
-      
-      // Redirect to login page
-      navigate('/');
-    } catch (error) {
-      let errorMessage = "Failed to logout";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      
-      toast({
-        title: "Logout failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Success",
+      description: "Logged out successfully",
+    });
+
+    navigate('/');
   };
 
   return (
@@ -175,14 +146,29 @@ export function Sidebar({ className }: SidebarProps) {
               </div>
             )}
           </div>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleLogout} 
-            title="Logout"
-          >
-            <LogOut size={18} />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                title="Logout"
+              >
+                <LogOut size={18} />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to log out? You will need to log in again to access your account.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </aside>

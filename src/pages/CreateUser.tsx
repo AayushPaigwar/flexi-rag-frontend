@@ -93,10 +93,10 @@ const CreateUser = () => {
 
   const onRequestLoginOtp = async () => {
     const values = loginForm.getValues();
-    if (!values.email) {
+    if (!values.email || !values.email.includes('@')) {
       toast({
         title: "Error",
-        description: "Email is required",
+        description: "Please enter a valid email address.",
         variant: "destructive",
       });
       return;
@@ -104,15 +104,19 @@ const CreateUser = () => {
 
     setIsLoading(true);
     try {
+      console.log("Requesting OTP for email:", values.email);
       const response = await signInWithOtp(values.email);
       setCurrentEmail(values.email);
       setIsVerifying(true);
-      
+
       verifyForm.reset({
         email: values.email,
         token: "",
       });
+
+      console.log(`OTP Send: ${response.message} | ${values.email}`);
       
+
       toast({
         title: "OTP sent",
         description: response.message || "Please check your email for OTP",
@@ -134,8 +138,8 @@ const CreateUser = () => {
     try {
       const emailToUse = currentEmail || values.email;
       
-      console.log("Verifying OTP with:", { email: emailToUse, token: values.token });
-      const response = await verifyOtp(emailToUse, values.token);
+      console.log("Verifying OTP with body:", { email: emailToUse, token: values.token });
+      const response = await verifyOtp(emailToUse, values.token); // Pass email and token
       
       localStorage.setItem('currentUserId', response.user.id);
       localStorage.setItem('currentUserName', response.user.name);
@@ -166,6 +170,19 @@ const CreateUser = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const onLogout = () => {
+    localStorage.clear(); // Clear user data from localStorage
+    setCurrentEmail('');
+    setIsVerifying(false);
+
+    toast({
+      title: "Logout successful",
+      description: "You have been logged out successfully.",
+    });
+
+    navigate('/');
   };
 
   const handleBack = () => {
@@ -333,6 +350,19 @@ const CreateUser = () => {
                   </div>
                 </form>
               </Form>
+              {/* <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onLogout}
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  "Logout"
+                )}
+              </Button> */}
             </div>
           )}
         </CardContent>

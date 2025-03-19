@@ -1,10 +1,10 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Bot, User, Paperclip, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
+import { Bot, Loader2, Send, User } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 export interface Message {
@@ -68,9 +68,9 @@ export function ChatInterface({
           <h3 className="font-medium">{modelName}</h3>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon">
+          {/* <Button variant="ghost" size="icon">
             <Plus size={18} />
-          </Button>
+          </Button> */}
         </div>
       </div>
       
@@ -97,9 +97,11 @@ export function ChatInterface({
       
       <div className="p-4 border-t border-border">
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" className="shrink-0">
+
+          
+          {/* <Button variant="ghost" size="icon" className="shrink-0">
             <Paperclip size={18} />
-          </Button>
+          </Button> */}
           <div className="relative flex-1">
             <Textarea
               ref={inputRef}

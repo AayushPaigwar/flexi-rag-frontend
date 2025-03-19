@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { 
-  Home, 
+  LayoutDashboard, 
   Database, 
   Settings, 
   Server, 
@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  User
+  User,
+  FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -28,15 +29,18 @@ export function Sidebar({ className }: SidebarProps) {
   const [expanded, setExpanded] = useState(true);
   const [userEmail, setUserEmail] = useState<string>('');
   const [userName, setUserName] = useState<string>('');
+  const [userId, setUserId] = useState<string>('');
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     const email = localStorage.getItem('currentUserEmail');
     const name = localStorage.getItem('currentUserName');
+    const id = localStorage.getItem('currentUserId');
     
     if (email) setUserEmail(email);
     if (name) setUserName(name);
+    if (id) setUserId(id);
   }, []);
 
   const toggleSidebar = () => {
@@ -110,13 +114,48 @@ export function Sidebar({ className }: SidebarProps) {
 
       <nav className="flex-1 overflow-y-auto p-2">
         <ul className="space-y-1">
-          <NavItem icon={<Home size={20} />} to="/" label="Dashboard" expanded={expanded} />
-          <NavItem icon={<Database size={20} />} to="/models" label="My RAG Models" expanded={expanded} />
-          <NavItem icon={<MessageSquare size={20} />} to="/chat" label="Chat Interface" expanded={expanded} />
-          <NavItem icon={<Upload size={20} />} to="/upload" label="Upload Data" expanded={expanded} />
-          <NavItem icon={<Server size={20} />} to="/deployments" label="Deployments" expanded={expanded} />
-          <NavItem icon={<Code size={20} />} to="/api" label="API Access" expanded={expanded} />
-          <NavItem icon={<Settings size={20} />} to="/settings" label="Settings" expanded={expanded} />
+          <NavItem 
+            icon={<LayoutDashboard size={20} />} 
+            to={`/documents/${userId}`} 
+            label="Dashboard" 
+            expanded={expanded} 
+          />
+          <NavItem 
+            icon={<FileText size={20} />} 
+            to={`/documents/${userId}`} 
+            label="My Documents" 
+            expanded={expanded} 
+          />
+          <NavItem 
+            icon={<MessageSquare size={20} />} 
+            to="/chat" 
+            label="Chat Interface" 
+            expanded={expanded} 
+          />
+          <NavItem 
+            icon={<Upload size={20} />} 
+            to="/upload" 
+            label="Upload Data" 
+            expanded={expanded} 
+          />
+          <NavItem 
+            icon={<Server size={20} />} 
+            to="/deployments" 
+            label="Deployments" 
+            expanded={expanded} 
+          />
+          <NavItem 
+            icon={<Code size={20} />} 
+            to="/api" 
+            label="API Access" 
+            expanded={expanded} 
+          />
+          <NavItem 
+            icon={<Settings size={20} />} 
+            to="/settings" 
+            label="Settings" 
+            expanded={expanded} 
+          />
         </ul>
       </nav>
 

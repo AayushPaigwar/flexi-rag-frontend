@@ -1,10 +1,10 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Loader2, Bot, User, Paperclip, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import ReactMarkdown from 'react-markdown';
 
 export interface Message {
   id: string;
@@ -32,12 +32,10 @@ export function ChatInterface({
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
   
-  // Focus input on load
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -61,7 +59,6 @@ export function ChatInterface({
       "flex flex-col bg-white rounded-xl border border-border/40 shadow-sm overflow-hidden h-[600px]",
       className
     )}>
-      {/* Chat header */}
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="p-2 bg-primary/10 rounded-full">
@@ -76,7 +73,6 @@ export function ChatInterface({
         </div>
       </div>
       
-      {/* Chat messages */}
       <ScrollArea className="flex-1 p-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-6 animate-fade-in">
@@ -98,7 +94,6 @@ export function ChatInterface({
         )}
       </ScrollArea>
       
-      {/* Input area */}
       <div className="p-4 border-t border-border">
         <div className="flex gap-2">
           <Button variant="ghost" size="icon" className="shrink-0">
@@ -152,7 +147,13 @@ function ChatMessage({ message }: { message: Message }) {
           ? "bg-primary text-primary-foreground rounded-tr-none" 
           : "bg-secondary text-secondary-foreground rounded-tl-none"
       )}>
-        <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+        {isUser ? (
+          <p className="whitespace-pre-wrap text-sm">{message.content}</p>
+        ) : (
+          <div className="prose prose-sm dark:prose-invert max-w-none text-secondary-foreground">
+            <ReactMarkdown>{message.content}</ReactMarkdown>
+          </div>
+        )}
       </div>
       {isUser && (
         <div className="p-2 h-8 bg-muted rounded-full shrink-0">

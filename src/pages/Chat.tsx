@@ -31,10 +31,13 @@ const Chat = () => {
     try {
       const response = await queryDocument(id, message);
       
+      // Process the response to ensure markdown formatting is preserved
+      const formattedAnswer = response.answer || "No answer provided";
+      
       const responseMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.answer,
+        content: formattedAnswer,
         timestamp: new Date(),
       };
       

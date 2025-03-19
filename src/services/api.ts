@@ -1,3 +1,4 @@
+
 /**
  * API Service for communicating with the FlexiRAG backend
  */
@@ -63,6 +64,21 @@ export const verifyOtp = async (email: string, token: string) => {
     return handleApiError(response);
   } catch (error) {
     console.error("Verify OTP error:", error);
+    throw error;
+  }
+};
+
+export const logoutUser = async (email: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/logout/?email=${encodeURIComponent(email)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return handleApiError(response);
+  } catch (error) {
+    console.error("Logout user error:", error);
     throw error;
   }
 };

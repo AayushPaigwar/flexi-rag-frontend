@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { 
   Home, 
   Database, 
@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { logoutUser } from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 
 interface SidebarProps {
   className?: string;
@@ -24,9 +26,60 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const [expanded, setExpanded] = useState(true);
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [userName, setUserName] = useState<string>('');
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const email = localStorage.getItem('currentUserEmail');
+    const name = localStorage.getItem('currentUserName');
+    
+    if (email) setUserEmail(email);
+    if (name) setUserName(name);
+  }, []);
 
   const toggleSidebar = () => {
     setExpanded(!expanded);
+  };
+
+  const handleLogout = async () => {
+    if (!userEmail) {
+      toast({
+        title: "Error",
+        description: "User email not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await logoutUser(userEmail);
+      
+      // Clear local storage
+      localStorage.removeItem('currentUserId');
+      localStorage.removeItem('currentUserName');
+      localStorage.removeItem('currentUserEmail');
+      
+      toast({
+        title: "Success",
+        description: "Logged out successfully",
+      });
+      
+      // Redirect to login page
+      navigate('/');
+    } catch (error) {
+      let errorMessage = "Failed to logout";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Logout failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -78,16 +131,19 @@ export function Sidebar({ className }: SidebarProps) {
             </div>
             {expanded && (
               <div className="flex flex-col">
-                <span className="text-sm font-medium">User</span>
-                <span className="text-xs text-muted-foreground">user@example.com</span>
+                <span className="text-sm font-medium">{userName || 'User'}</span>
+                <span className="text-xs text-muted-foreground">{userEmail || 'user@example.com'}</span>
               </div>
             )}
           </div>
-          {expanded && (
-            <Button variant="ghost" size="icon">
-              <LogOut size={18} />
-            </Button>
-          )}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleLogout} 
+            title="Logout"
+          >
+            <LogOut size={18} />
+          </Button>
         </div>
       </div>
     </aside>

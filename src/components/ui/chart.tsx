@@ -1,5 +1,14 @@
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
+import {
+  Bar,
+  CartesianGrid,
+  Line,
+  BarChart as RechartsBarChart,
+  LineChart as RechartsLineChart,
+  XAxis,
+  YAxis
+} from "recharts"
 
 import { cn } from "@/lib/utils"
 
@@ -353,11 +362,99 @@ function getPayloadConfigFromPayload(
     : config[key as keyof typeof config]
 }
 
-export {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-  ChartStyle,
+interface ChartProps {
+  data: any[]
+  categories: string[]
+  index: string
+  colors?: string[]
+  valueFormatter?: (value: number) => string
+  className?: string
 }
+
+const LineChart = ({
+  data,
+  categories,
+  index,
+  colors,
+  valueFormatter,
+  className,
+}: ChartProps) => {
+  return (
+    <ChartContainer className={className} config={{}}>
+      <RechartsLineChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey={index}
+          stroke="#888888"
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+        />
+        <YAxis
+          stroke="#888888"
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={valueFormatter}
+        />
+        {categories.map((category, i) => (
+          <Line
+            key={category}
+            type="monotone"
+            dataKey={category}
+            stroke={colors?.[i]}
+            strokeWidth={2}
+            dot={false}
+          />
+        ))}
+      </RechartsLineChart>
+    </ChartContainer>
+  )
+}
+
+const BarChart = ({
+  data,
+  categories,
+  index,
+  colors,
+  valueFormatter,
+  className,
+}: ChartProps) => {
+  return (
+    <ChartContainer className={className} config={{}}>
+      <RechartsBarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey={index}
+          stroke="#888888"
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+        />
+        <YAxis
+          stroke="#888888"
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={valueFormatter}
+        />
+        {categories.map((category, i) => (
+          <Bar
+            key={category}
+            dataKey={category}
+            fill={colors?.[i]}
+            radius={[4, 4, 0, 0]}
+          />
+        ))}
+      </RechartsBarChart>
+    </ChartContainer>
+  )
+}
+
+export {
+  BarChart, ChartContainer, ChartLegend,
+  ChartLegendContent,
+  ChartStyle, ChartTooltip,
+  ChartTooltipContent, LineChart
+}
+

@@ -1,16 +1,20 @@
-
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import NotFound from "./pages/NotFound";
-import CreateUser from "./pages/CreateUser";
-import UploadDocument from "./pages/UploadDocument";
-import DocumentsList from "./pages/DocumentsList";
-import Chat from "./pages/Chat";
-import { MainLayout } from "./components/layout/MainLayout";
 import { useEffect, useState } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Sidebar } from "./components/layout/Sidebar";
+import ApiPage from "./pages/ApiPage";
+import Chat from "./pages/Chat";
+import ChatPage from "./pages/ChatPage";
+import CreateUser from "./pages/CreateUser";
+import Dashboard from "./pages/Dashboard";
+import DeploymentsPage from "./pages/DeploymentsPage";
+import DocumentsList from "./pages/DocumentsList";
+import NotFound from "./pages/NotFound";
+import SettingsPage from "./pages/SettingsPage";
+import UploadDocument from "./pages/UploadDocument";
 
 // Auth protection component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -24,6 +28,17 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const queryClient = new QueryClient();
+
+const BaseLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="flex h-screen">
+      <Sidebar />
+      <main className="flex-1 overflow-auto p-8">
+        {children}
+      </main>
+    </div>
+  );
+};
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -43,28 +58,68 @@ const App = () => {
             {/* Public route */}
             <Route path="/" element={<CreateUser />} />
             
-            {/* Protected routes with MainLayout */}
-            <Route path="/upload" element={
+            {/* Protected routes with BaseLayout */}
+            <Route path="/dashboard" element={
               <ProtectedRoute>
-                <MainLayout>
-                  <UploadDocument />
-                </MainLayout>
+                <BaseLayout>
+                  <Dashboard />
+                </BaseLayout>
               </ProtectedRoute>
             } />
             
             <Route path="/documents/:userId" element={
               <ProtectedRoute>
-                <MainLayout>
+                <BaseLayout>
                   <DocumentsList />
-                </MainLayout>
+                </BaseLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/upload" element={
+              <ProtectedRoute>
+                <BaseLayout>
+                  <UploadDocument />
+                </BaseLayout>
               </ProtectedRoute>
             } />
             
             <Route path="/chat/:id" element={
               <ProtectedRoute>
-                <MainLayout>
+                <BaseLayout>
                   <Chat />
-                </MainLayout>
+                </BaseLayout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <BaseLayout>
+                  <ChatPage />
+                </BaseLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/deployments" element={
+              <ProtectedRoute>
+                <BaseLayout>
+                  <DeploymentsPage />
+                </BaseLayout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/api" element={
+              <ProtectedRoute>
+                <BaseLayout>
+                  <ApiPage />
+                </BaseLayout>
+              </ProtectedRoute>
+            } />
+
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <BaseLayout>
+                  <SettingsPage />
+                </BaseLayout>
               </ProtectedRoute>
             } />
             

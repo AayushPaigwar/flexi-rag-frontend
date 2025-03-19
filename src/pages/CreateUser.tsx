@@ -2,21 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from '@/hooks/use-toast';
-import { createUser, signInWithOtp, verifyOtp } from '@/services/api';
+import { signInWithOtp, verifyOtp } from '@/services/api';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Key, Loader, Mail, UserPlus } from 'lucide-react';
+import { Key, Loader, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import { z } from "zod";
-
-const signupSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  phone_number: z.string().optional(),
-});
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -25,6 +18,17 @@ const loginSchema = z.object({
 const verifySchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
   token: z.string().min(1, { message: "Please enter the OTP code." }),
+  name: z.string().optional(),
+  phone_number: z.string().optional()
+}).refine((data) => {
+  // Only require name if user is new
+  if (window.isNewUser) {
+    return !!data.name && data.name.length >= 2;
+  }
+  return true;
+}, {
+  message: "Name is required and must be at least 2 characters.",
+  path: ["name"]
 });
 
 const CreateUser = () => {
@@ -33,12 +37,7 @@ const CreateUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('');
-  const [activeTab, setActiveTab] = useState('login');
-
-  const signupForm = useForm<z.infer<typeof signupSchema>>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: { name: "", email: "", phone_number: "" },
-  });
+  const [isNewUser, setIsNewUser] = useState(false);
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -47,75 +46,26 @@ const CreateUser = () => {
 
   const verifyForm = useForm<z.infer<typeof verifySchema>>({
     resolver: zodResolver(verifySchema),
-    defaultValues: { email: "", token: "" },
+    defaultValues: { email: "", token: "", name: "", phone_number: "" },
   });
-
-  const onSignup = async (values: z.infer<typeof signupSchema>) => {
-    if (!values.name) {
-      toast({
-        title: "Error",
-        description: "Name is required",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const response = await createUser({
-        name: values.name,
-        email: values.email,
-        phone_number: values.phone_number,
-      });
-      setCurrentEmail(values.email);
-      setIsVerifying(true);
-      
-      verifyForm.reset({
-        email: values.email,
-        token: "",
-      });
-      
-      toast({
-        title: "Sign up successful",
-        description: response.message || "Please check your email for OTP verification",
-      });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to create user";
-      toast({
-        title: "Sign up failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const onRequestLoginOtp = async () => {
     const values = loginForm.getValues();
-    if (!values.email || !values.email.includes('@')) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid email address.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
     try {
-      console.log("Requesting OTP for email:", values.email);
       const response = await signInWithOtp(values.email);
       setCurrentEmail(values.email);
       setIsVerifying(true);
-
+      setIsNewUser(response.is_new_user || false);
+      // Add this line to make isNewUser available to schema validation
+      window.isNewUser = response.is_new_user || false;
+      
       verifyForm.reset({
         email: values.email,
         token: "",
+        name: "",
+        phone_number: ""
       });
-
-      console.log(`OTP Send: ${response.message} | ${values.email}`);
-      
 
       toast({
         title: "OTP sent",
@@ -124,7 +74,7 @@ const CreateUser = () => {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to send OTP";
       toast({
-        title: "Login failed",
+        title: "Failed to send OTP",
         description: errorMessage,
         variant: "destructive",
       });
@@ -136,32 +86,27 @@ const CreateUser = () => {
   const onVerify = async (values: z.infer<typeof verifySchema>) => {
     setIsLoading(true);
     try {
-      const emailToUse = currentEmail || values.email;
-      
-      console.log("Verifying OTP with body:", { email: emailToUse, token: values.token });
-      const response = await verifyOtp(emailToUse, values.token); // Pass email and token
-      
+      const dataToSend = {
+        email: currentEmail || values.email,
+        token: values.token,
+        name: isNewUser ? (values.name || '') : '',
+        phone_number: isNewUser ? (values.phone_number || '') : ''
+      };
+
+      const response = await verifyOtp(dataToSend);
+
       localStorage.setItem('currentUserId', response.user.id);
       localStorage.setItem('currentUserName', response.user.name);
       localStorage.setItem('currentUserEmail', response.user.email);
-      
+
       toast({
         title: "Verification successful",
         description: response.message || "Email verified successfully",
       });
-      
+
       navigate(`/documents/${response.user.id}`);
     } catch (error) {
-      let errorMessage = "Failed to verify OTP";
-      
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (error && typeof error === 'object') {
-        errorMessage = JSON.stringify(error);
-      }
-      
-      console.error("OTP verification error:", error);
-      
+      const errorMessage = error instanceof Error ? error.message : "Failed to verify OTP";
       toast({
         title: "Verification failed",
         description: errorMessage,
@@ -172,24 +117,6 @@ const CreateUser = () => {
     }
   };
 
-  const onLogout = () => {
-    localStorage.clear(); // Clear user data from localStorage
-    setCurrentEmail('');
-    setIsVerifying(false);
-
-    toast({
-      title: "Logout successful",
-      description: "You have been logged out successfully.",
-    });
-
-    navigate('/');
-  };
-
-  const handleBack = () => {
-    setIsVerifying(false);
-    verifyForm.reset();
-  };
-
   return (
     <div className="container max-w-md mx-auto py-10">
       <Card>
@@ -197,56 +124,73 @@ const CreateUser = () => {
           <CardTitle>FlexiRAG Platform</CardTitle>
           <CardDescription>
             {!isVerifying 
-              ? "Create a profile or login to start using the FlexiRAG platform"
-              : "Enter the OTP sent to your email"}
+              ? "Sign in to start using the FlexiRAG platform"
+              : isNewUser 
+                ? "Complete your registration"
+                : "Enter verification code"}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {!isVerifying ? (
-            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="login">
-                <Form {...loginForm}>
-                  <form className="space-y-6">
+            <Form {...loginForm}>
+              <form className="space-y-6">
+                <FormField
+                  control={loginForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="john@example.com" type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button 
+                  type="button" 
+                  className="w-full" 
+                  onClick={onRequestLoginOtp}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Mail className="mr-2 h-4 w-4" />
+                  )}
+                  {isLoading ? "Sending OTP..." : "Send OTP to Email"}
+                </Button>
+              </form>
+            </Form>
+          ) : (
+            <Form {...verifyForm}>
+              <form onSubmit={verifyForm.handleSubmit(onVerify)} className="space-y-6">
+                <div className="space-y-2">
+                  <FormLabel>Email</FormLabel>
+                  <Input 
+                    type="email" 
+                    value={currentEmail}
+                    disabled
+                    className="bg-gray-100"
+                  />
+                </div>
+                <FormField
+                  control={verifyForm.control}
+                  name="token"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>OTP Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter OTP" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {isNewUser && (
+                  <>
                     <FormField
-                      control={loginForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="john@example.com" type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button 
-                      type="button" 
-                      className="w-full" 
-                      onClick={onRequestLoginOtp}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <Loader className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Mail className="mr-2 h-4 w-4" />
-                      )}
-                      {isLoading ? "Sending OTP..." : "Send OTP to Email"}
-                    </Button>
-                  </form>
-                </Form>
-              </TabsContent>
-
-              <TabsContent value="signup">
-                <Form {...signupForm}>
-                  <form onSubmit={signupForm.handleSubmit(onSignup)} className="space-y-6">
-                    <FormField
-                      control={signupForm.control}
+                      control={verifyForm.control}
                       name="name"
                       render={({ field }) => (
                         <FormItem>
@@ -258,21 +202,9 @@ const CreateUser = () => {
                         </FormItem>
                       )}
                     />
+                    
                     <FormField
-                      control={signupForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input placeholder="john@example.com" type="email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={signupForm.control}
+                      control={verifyForm.control}
                       name="phone_number"
                       render={({ field }) => (
                         <FormItem>
@@ -284,86 +216,35 @@ const CreateUser = () => {
                         </FormItem>
                       )}
                     />
-                    <Button 
-                      type="submit" 
-                      className="w-full"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <Loader className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <UserPlus className="mr-2 h-4 w-4" />
-                      )}
-                      {isLoading ? "Processing..." : "Create Profile"}
-                    </Button>
-                  </form>
-                </Form>
-              </TabsContent>
-            </Tabs>
-          ) : (
-            <div className="space-y-6">
-              <Form {...verifyForm}>
-                <form onSubmit={verifyForm.handleSubmit(onVerify)} className="space-y-6">
-                  <div className="space-y-2">
-                    <FormLabel>Email</FormLabel>
-                    <Input 
-                      type="email" 
-                      value={currentEmail}
-                      disabled
-                      className="bg-gray-100"
-                    />
-                  </div>
-                  <FormField
-                    control={verifyForm.control}
-                    name="token"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>OTP Code</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter OTP" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex space-x-2">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={handleBack}
-                      className="flex-1"
-                    >
-                      Back
-                    </Button>
-                    <Button 
-                      type="submit" 
-                      className="flex-1"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <Loader className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Key className="mr-2 h-4 w-4" />
-                      )}
-                      {isLoading ? "Verifying..." : "Verify OTP"}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-              {/* <Button 
-                type="button" 
-                variant="outline" 
-                onClick={onLogout}
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  "Logout"
+                  </>
                 )}
-              </Button> */}
-            </div>
+                <div className="flex space-x-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      setIsVerifying(false);
+                      setIsNewUser(false);
+                    }}
+                    className="flex-1"
+                  >
+                    Back
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    className="flex-1"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Key className="mr-2 h-4 w-4" />
+                    )}
+                    {isLoading ? "Verifying..." : isNewUser ? "Complete Registration" : "Verify OTP"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           )}
         </CardContent>
         <CardFooter className="flex justify-center text-sm text-muted-foreground">
@@ -375,3 +256,10 @@ const CreateUser = () => {
 };
 
 export default CreateUser;
+
+// Add TypeScript declaration for the window object
+declare global {
+  interface Window {
+    isNewUser: boolean;
+  }
+}

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -163,6 +162,30 @@ export default {
 					'scrollbar-width': 'none',
 					'&::-webkit-scrollbar': {
 						'display': 'none',
+					},
+					'@keyframes float': {
+						'0%': { transform: 'translateY(0px)' },
+						'50%': { transform: 'translateY(-10px)' },
+						'100%': { transform: 'translateY(0px)' },
+					},
+					'@keyframes gradient': {
+						'0%': { backgroundPosition: '0% 50%' },
+						'100%': { backgroundPosition: '100% 50%' },
+					},
+					'.animate-float': {
+						animation: 'float 3s ease-in-out infinite',
+					},
+					'.animate-gradient': {
+						backgroundSize: '200% 200%',
+						animation: 'gradient 4s linear infinite alternate',
+					},
+					'.bg-grid-white': {
+						backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+						backgroundSize: '24px 24px',
+					},
+					'.bg-grid-black': {
+						backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px)',
+						backgroundSize: '24px 24px',
 					},
 				},
 			})

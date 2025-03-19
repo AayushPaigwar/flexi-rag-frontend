@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { ChatInterface, Message } from '@/components/chat/ChatInterface';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
-import { queryDocument } from '@/services/api';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { queryDocument } from '@/services/api';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const Chat = () => {
   const { id } = useParams<{ id: string }>();
@@ -66,21 +66,6 @@ const Chat = () => {
   
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="flex items-center mb-6">
-        <Button 
-          variant="outline" 
-          onClick={() => {
-            const userId = localStorage.getItem('currentUserId');
-            navigate(userId ? `/documents/${userId}` : '/');
-          }} 
-          className="mr-4"
-        >
-          <ArrowLeft size={16} className="mr-2" />
-          Back to Documents
-        </Button>
-        <h1 className="text-3xl font-bold">Chat with Document</h1>
-      </div>
-      
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle>Ask questions about your document</CardTitle>

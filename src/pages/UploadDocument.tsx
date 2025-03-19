@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileUpload, FileItem } from '@/components/upload/FileUpload';
-import { ArrowLeft, Upload as UploadIcon } from 'lucide-react';
-import { uploadDocument } from '@/services/api';
+import { FileItem, FileUpload } from '@/components/upload/FileUpload';
 import { useToast } from '@/hooks/use-toast';
+import { uploadDocument } from '@/services/api';
+import { Upload as UploadIcon } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const UploadDocument = () => {
   const navigate = useNavigate();
@@ -133,40 +133,35 @@ const UploadDocument = () => {
   };
   
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex items-center mb-6">
-        <Button variant="outline" onClick={() => navigate(-1)} className="mr-4">
-          <ArrowLeft size={16} className="mr-2" />
-          Back
-        </Button>
-        <h1 className="text-3xl font-bold">Upload Document</h1>
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex justify-center items-center h-full">
+          <Card className="max-w-3xl w-full">
+            <CardHeader>
+              <CardTitle>Upload a Document</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FileUpload
+                onFilesSelected={handleFilesSelected}
+                uploadedFiles={files}
+                onRemoveFile={handleRemoveFile}
+                disabled={uploading}
+                acceptedFileTypes={['.pdf', '.txt', '.docx', '.csv', '.xlsx', '.xls', '.json']}
+              />
+              <div className="flex justify-end mt-6">
+                <Button 
+                  onClick={handleUpload} 
+                  disabled={files.length === 0 || uploading}
+                  className="w-full md:w-auto"
+                >
+                  <UploadIcon size={16} className="mr-2" />
+                  {uploading ? 'Uploading...' : 'Upload Document'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-      
-      <Card className="max-w-3xl mx-auto">
-        <CardHeader>
-          <CardTitle>Upload a Document</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <FileUpload
-            onFilesSelected={handleFilesSelected}
-            uploadedFiles={files}
-            onRemoveFile={handleRemoveFile}
-            disabled={uploading}
-            acceptedFileTypes={['.pdf', '.txt', '.docx', '.csv', '.xlsx', '.xls', '.json']}
-          />
-          
-          <div className="flex justify-end mt-6">
-            <Button 
-              onClick={handleUpload} 
-              disabled={files.length === 0 || uploading}
-              className="w-full md:w-auto"
-            >
-              <UploadIcon size={16} className="mr-2" />
-              {uploading ? 'Uploading...' : 'Upload Document'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

@@ -87,7 +87,7 @@ export function Sidebar({ className }: SidebarProps) {
         <ul className="space-y-1">
           <NavItem 
             icon={<LayoutDashboard size={20} />} 
-            to={`/documents/${userId}`} 
+            to="/dashboard" 
             label="Dashboard" 
             expanded={expanded} 
           />

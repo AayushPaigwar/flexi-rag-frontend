@@ -1,6 +1,5 @@
-
-import { ModelCardProps } from '@/components/models/ModelCard';
 import { Message } from '@/components/chat/ChatInterface';
+import { ModelCardProps } from '@/components/models/ModelCard';
 import { FileItem } from '@/components/upload/FileUpload';
 
 // User type to match API schema
@@ -164,4 +163,19 @@ export const mockUsageStats = {
   totalUploads: 45,
   totalStorage: 128.5, // MB
   averagePrecision: 92.7, // %
+  queriesOverTime: [
+    { date: '2023-10-01', queries: 124 },
+    { date: '2023-10-02', queries: 180 },
+    { date: '2023-10-03', queries: 257 },
+    { date: '2023-10-04', queries: 198 },
+    { date: '2023-10-05', queries: 334 },
+    { date: '2023-10-06', queries: 245 },
+    { date: '2023-10-07', queries: 289 },
+  ],
+  usageDistribution: [
+    { type: 'Documents', count: 45 },
+    { type: 'Queries', count: 892 },
+    { type: 'API Calls', count: 344 },
+    { type: 'Models', count: 22 },
+  ],
 };

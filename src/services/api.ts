@@ -18,21 +18,8 @@ const handleApiError = async (response: Response) => {
 };
 
 // User API
-export const createUser = async (userData: { name: string; email: string; phone_number?: string }) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
-    return handleApiError(response);
-  } catch (error) {
-    console.error("Create user error:", error);
-    throw error;
-  }
-};
+
+// Remove createUser export since it's no longer needed
 
 export const signInWithOtp = async (email: string) => {
   try {
@@ -40,7 +27,6 @@ export const signInWithOtp = async (email: string) => {
       throw new Error("Invalid email address provided.");
     }
 
-    console.log(`Sending sign-in OTP request with email: ${email}`);
     const response = await fetch(`${API_BASE_URL}/users/signin-otp/`, {
       method: 'POST',
       headers: {
@@ -56,15 +42,19 @@ export const signInWithOtp = async (email: string) => {
   }
 };
 
-export const verifyOtp = async (email: string, token: string) => {
+export const verifyOtp = async (data: { 
+  email: string; 
+  token: string; 
+  name: string; // Required but can be empty string
+  phone_number: string; // Required but can be empty string
+}) => {
   try {
-    console.log(`Sending verify OTP request with body:`, { email, token });
     const response = await fetch(`${API_BASE_URL}/users/verify-otp/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, token }), // Pass email and token in the body
+      body: JSON.stringify(data),
     });
 
     return handleApiError(response);

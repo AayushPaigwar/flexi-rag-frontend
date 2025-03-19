@@ -1,19 +1,18 @@
-
-import React from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
-import { PageHeader } from '@/components/layout/PageHeader';
 import { StatsCard } from '@/components/dashboard/StatsCard';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { ModelCard } from '@/components/models/ModelCard';
 import { Button } from '@/components/ui/button';
-import { Plus, BarChart2, Database, MessageSquare, Server } from 'lucide-react';
-import { mockModels, mockUsageStats, mockDeploymentStats } from '@/data/mock-data';
-import { useNavigate } from 'react-router-dom';
+import { Card } from '@/components/ui/card';
+import { BarChart, LineChart } from '@/components/ui/chart';
+import { mockDeploymentStats, mockModels, mockUsageStats } from '@/data/mock-data';
 import { useToast } from '@/hooks/use-toast';
+import { Clock, Database, MessageSquare, Plus, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const handleCreateModel = () => {
     navigate('/models/new');
   };
@@ -32,23 +31,42 @@ const Dashboard = () => {
       description: "The RAG model has been deleted successfully.",
     });
   };
-  
+
+  const chartData = {
+    queries: [
+      { date: "Mon", queries: 124 },
+      { date: "Tue", queries: 180 },
+      { date: "Wed", queries: 257 },
+      { date: "Thu", queries: 198 },
+      { date: "Fri", queries: 334 },
+      { date: "Sat", queries: 245 },
+      { date: "Sun", queries: 289 },
+    ],
+    usage: [
+      { name: "Documents", value: 45 },
+      { name: "Queries", value: 892 },
+      { name: "API Calls", value: 344 },
+      { name: "Models", value: 22 },
+    ]
+  };
+
   return (
-    <MainLayout>
+    <div className="space-y-8 max-w-7xl mx-auto">
       <PageHeader 
         title="Dashboard" 
-        description="Manage your RAG models and view analytics."
+        description="View your documents and analytics"
+        className="mb-8"
       >
-        <Button onClick={handleCreateModel}>
+        <Button onClick={() => navigate('/upload')}>
           <Plus size={16} className="mr-2" />
-          New Model
+          Upload Data
         </Button>
       </PageHeader>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard 
-          title="Total Models" 
-          value={mockModels.length} 
+          title="Total Documents" 
+          value={mockUsageStats.totalUploads} 
           icon={<Database size={20} />}
           trend={{ value: 25, positive: true }}
         />
@@ -59,22 +77,48 @@ const Dashboard = () => {
           trend={{ value: 12, positive: true }}
         />
         <StatsCard 
-          title="Active Deployments" 
-          value={mockDeploymentStats.activeDeployments} 
-          icon={<Server size={20} />}
-          trend={{ value: 50, positive: true }}
+          title="Avg Response Time" 
+          value={`${mockDeploymentStats.averageLatency}ms`} 
+          icon={<Clock size={20} />}
+          trend={{ value: 8, positive: false }}
         />
         <StatsCard 
-          title="Average Precision" 
+          title="Success Rate" 
           value={`${mockUsageStats.averagePrecision}%`} 
-          icon={<BarChart2 size={20} />}
+          icon={<TrendingUp size={20} />}
           trend={{ value: 2, positive: true }}
         />
       </div>
-      
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Recent Models</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <div className="grid gap-8 md:grid-cols-2 mt-8">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-6">Weekly Query Volume</h3>
+          <LineChart
+            data={chartData.queries}
+            categories={["queries"]}
+            index="date"
+            colors={["#0ea5e9"]}
+            valueFormatter={(value: number) => `${value} queries`}
+            className="aspect-[4/3]"
+          />
+        </Card>
+        
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-6">Usage Distribution</h3>
+          <BarChart
+            data={chartData.usage}
+            index="name"
+            categories={["value"]}
+            colors={["#8b5cf6"]}
+            valueFormatter={(value: number) => `${value}`}
+            className="aspect-[4/3]"
+          />
+        </Card>
+      </div>
+
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-6">Recent Models</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {mockModels.slice(0, 3).map((model) => (
             <ModelCard 
               key={model.id}
@@ -86,61 +130,7 @@ const Dashboard = () => {
           ))}
         </div>
       </div>
-      
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Quick Actions</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <ActionCard 
-            title="Upload Data" 
-            description="Add new documents to train your RAG models"
-            icon={<Database size={24} />}
-            onClick={() => navigate('/upload')}
-          />
-          <ActionCard 
-            title="Create Model" 
-            description="Configure and train a new RAG model"
-            icon={<Plus size={24} />}
-            onClick={handleCreateModel}
-          />
-          <ActionCard 
-            title="Test Chat" 
-            description="Try out your RAG models with the chat interface"
-            icon={<MessageSquare size={24} />}
-            onClick={() => navigate('/chat')}
-          />
-          <ActionCard 
-            title="Manage Deployments" 
-            description="Configure and monitor your model deployments"
-            icon={<Server size={24} />}
-            onClick={() => navigate('/deployments')}
-          />
-        </div>
-      </div>
-    </MainLayout>
-  );
-};
-
-interface ActionCardProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  onClick?: () => void;
-}
-
-const ActionCard = ({ title, description, icon, onClick }: ActionCardProps) => {
-  return (
-    <button
-      onClick={onClick}
-      className="bg-white rounded-xl p-6 border border-border/40 shadow-sm hover:shadow-md transition-all duration-300 text-left flex flex-col items-start animate-scale-in"
-    >
-      <div className="p-3 bg-primary/10 rounded-lg text-primary mb-4">
-        {icon}
-      </div>
-      <h3 className="font-medium mb-1">{title}</h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
-    </button>
+    </div>
   );
 };
 

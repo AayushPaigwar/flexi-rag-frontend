@@ -111,6 +111,7 @@ const UploadDocument = () => {
         }, 1500);
       }
     } catch (error) {
+      console.log(`Error: ${error}`);
       toast({
         title: "Upload failed",
         description: error instanceof Error ? error.message : "An unknown error occurred",

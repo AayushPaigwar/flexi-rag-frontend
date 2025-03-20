@@ -66,12 +66,15 @@ export function Sidebar({ className }: SidebarProps) {
       )}
     >
       <div className="flex items-center justify-between p-4 border-b border-border">
-        {expanded ? (
-          <h1 className="text-xl font-medium animate-fade-in">FlexiRAG</h1>
-        ) : (
-          <div className="w-full flex justify-center">
-            <span className="font-semibold text-primary">F</span>
-          </div>
+        {expanded && (
+            <div className="w-full flex justify-center">
+            <img 
+              src="/icon_no_bg.png" 
+              alt="Logo" 
+              className="h-10 w-28 cursor-pointer" 
+              onClick={() => navigate('/dashboard')} 
+            />
+            </div>
         )}
         <Button 
           variant="ghost" 

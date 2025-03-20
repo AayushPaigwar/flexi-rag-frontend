@@ -121,7 +121,7 @@ const CreateUser = () => {
     <div className="container max-w-md mx-auto py-10">
       <Card>
         <CardHeader>
-          <CardTitle>FlexiRAG Platform</CardTitle>
+          <CardTitle>FlexiRAG: Make your Custom RAG Agents</CardTitle>
           <CardDescription>
             {!isVerifying 
               ? "Sign in to start using the FlexiRAG platform"

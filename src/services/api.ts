@@ -1,8 +1,8 @@
 /**
  * API Service for communicating with the FlexiRAG backend
  */
-// const API_BASE_URL = 'https://flexi-rag.azurewebsites.net/api/v1';
-export const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = 'https://flexi-rag.azurewebsites.net/api/v1';
+// export const API_BASE_URL = 'http://localhost:8000/api/v1';
 
 const handleApiError = async (response: Response) => {
   if (!response.ok) {
@@ -253,4 +253,28 @@ export const getAvailableDocuments = async (userId: string) => {
     console.error("Get available documents error:", error);
     throw error;
   }
+};
+
+// Add this interface
+interface GeminiKeyResponse {
+  status: string;
+  gemini_api_key: string;
+  message: string;
+}
+
+// Add this function
+export const getGeminiApiKey = async (userId: string): Promise<GeminiKeyResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/v1/keys/get`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ user_id: userId }),
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch API key');
+  }
+  
+  return response.json();
 };

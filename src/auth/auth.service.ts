@@ -2,7 +2,10 @@
 import { AuthResponse, VerifyOtpResponse } from './types/auth.types';
 
 export class AuthService {
-  private readonly API_URL = 'https://flexi-rag.azurewebsites.net/api/v1'; // Adjust this URL based on your backend configuration
+
+  // TODO: chnage the API URL to the correct one
+  // private readonly API_URL = 'https://flexi-rag.azurewebsites.net/api/v1';
+  private readonly API_URL = 'http://localhost:8000/api/v1';
 
   /**
    * Signs in a user by sending an OTP to their email

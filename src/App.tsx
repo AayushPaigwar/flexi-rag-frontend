@@ -10,10 +10,10 @@ import Chat from "./pages/Chat";
 import ChatPage from "./pages/ChatPage";
 import CreateUser from "./pages/CreateUser";
 import Dashboard from "./pages/Dashboard";
-import DeploymentsPage from "./pages/DeploymentsPage";
+import DeploymentsPage from './pages/DeploymentsPage';
 import DocumentsList from "./pages/DocumentsList";
 import NotFound from "./pages/NotFound";
-import SettingsPage from "./pages/SettingsPage";
+import SettingsPage from './pages/SettingsPage';
 import UploadDocument from "./pages/UploadDocument";
 
 // Auth protection component
@@ -90,15 +90,8 @@ const App = () => {
                 </BaseLayout>
               </ProtectedRoute>
             } />
-
-            <Route path="/chat" element={
-              <ProtectedRoute>
-                <BaseLayout>
-                  <ChatPage />
-                </BaseLayout>
-              </ProtectedRoute>
-            } />
             
+            {/* New routes for Deployments, API, and Settings */}
             <Route path="/deployments" element={
               <ProtectedRoute>
                 <BaseLayout>
@@ -106,7 +99,7 @@ const App = () => {
                 </BaseLayout>
               </ProtectedRoute>
             } />
-
+            
             <Route path="/api" element={
               <ProtectedRoute>
                 <BaseLayout>
@@ -114,7 +107,7 @@ const App = () => {
                 </BaseLayout>
               </ProtectedRoute>
             } />
-
+            
             <Route path="/settings" element={
               <ProtectedRoute>
                 <BaseLayout>
@@ -123,7 +116,8 @@ const App = () => {
               </ProtectedRoute>
             } />
             
-            <Route path="*" element={<NotFound />} />
+            {/* Catch-all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

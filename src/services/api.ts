@@ -64,22 +64,25 @@ export const verifyOtp = async (data: {
   }
 };
 
-export const logoutUser = async (email: string) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/logout/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    });
+// Update the logoutUser function with the correct endpoint
+// export const logoutUser = async (email: string) => {
+//   try {
+//     console.log("Logging out user:", email);
     
-    return handleApiError(response);
-  } catch (error) {
-    console.error("Logout user error:", error); // Log error
-    throw error;
-  }
-};
+//     const response = await fetch(`${API_BASE_URL}/users/logout/`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ email }),
+//     });
+    
+//     return handleApiError(response);
+//   } catch (error) {
+//     console.error("Logout user error:", error);
+//     throw error;
+//   }
+// };
 
 // Document API
 export const getUserDocuments = async (userId: string) => {
@@ -264,7 +267,9 @@ interface GeminiKeyResponse {
 
 // Add this function
 export const getGeminiApiKey = async (userId: string): Promise<GeminiKeyResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/v1/keys/get`, {
+
+  console.log("getGeminiApiKey Userid :", userId);
+  const response = await fetch(`${API_BASE_URL}/keys/get`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

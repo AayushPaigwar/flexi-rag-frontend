@@ -1,19 +1,29 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { 
-  Home, 
-  Upload, 
-  FileText, 
-  LogOut, 
-  ChevronLeft, 
-  ChevronRight,
-  Server,
-  Key,
-  Settings
-} from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
-import { logoutUser } from '@/services/api';
+import {
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Home,
+  Key,
+  LogOut,
+  Server,
+  Settings,
+  Upload
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   className?: string;
@@ -24,6 +34,7 @@ export function Sidebar({ className }: SidebarProps) {
   const [userEmail, setUserEmail] = useState<string>('');
   const [userName, setUserName] = useState<string>('');
   const [userId, setUserId] = useState<string>('');
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const location = useLocation();
@@ -38,28 +49,39 @@ export function Sidebar({ className }: SidebarProps) {
     if (id) setUserId(id);
   }, []);
 
+  // Update the handleLogout function
   const handleLogout = async () => {
     try {
       if (userEmail) {
-        await logoutUser(userEmail);
+        console.log('Logging out user:', userEmail);
+        // await logoutUser(userEmail);
+        
+        // Clear local storage
+        localStorage.removeItem('currentUserEmail');
+        localStorage.removeItem('currentUserName');
+        localStorage.removeItem('currentUserId');
+        
+        toast({
+          title: "Logged out successfully",
+          description: "You have been logged out of your account.",
+        });
+        
+        navigate('/');
+      } else {
+        console.error('No user email found for logout');
+        // Still clear storage and redirect even if API call fails
+        localStorage.clear();
+        navigate('/');
       }
-      
-      localStorage.removeItem('currentUserEmail');
-      localStorage.removeItem('currentUserName');
-      localStorage.removeItem('currentUserId');
-      
-      toast({
-        title: "Logged out successfully",
-        description: "You have been logged out of your account.",
-      });
-      
-      navigate('/');
     } catch (error) {
       console.error("Logout error:", error);
+      // Still clear storage and redirect even if API call fails
+      localStorage.clear();
+      navigate('/');
+      
       toast({
-        title: "Logout failed",
-        description: "There was an error logging out. Please try again.",
-        variant: "destructive",
+        title: "Logout completed",
+        description: "You have been logged out of your account.",
       });
     }
   };
@@ -158,14 +180,30 @@ export function Sidebar({ className }: SidebarProps) {
               <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
             </div>
           )}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleLogout}
-            title="Logout"
-          >
-            <LogOut size={18} />
-          </Button>
+          
+          <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                title="Logout"
+              >
+                <LogOut size={18} />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You will be logged out of your account and redirected to the login page.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>

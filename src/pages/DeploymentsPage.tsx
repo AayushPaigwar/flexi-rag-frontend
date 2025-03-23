@@ -9,7 +9,8 @@ import {
   deployDocument,
   DeploymentResponse,
   getAvailableDocuments,
-  getDeployedDocuments
+  getDeployedDocuments,
+  getGeminiApiKey
 } from '@/services/api';
 import { Check, Clipboard, Server } from "lucide-react";
 import { useEffect, useState } from 'react';
@@ -127,6 +128,93 @@ const DeploymentsPage = () => {
     setTimeout(() => setCopied(null), 2000);
   };
 
+  // Add state for API key
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  
+  // Add this function
+  const fetchApiKey = async (userId: string) => {
+    try {
+      const response = await getGeminiApiKey(userId);
+      if (response && response.status === "success") {
+        setApiKey(response.gemini_api_key);
+      } else {
+        setApiKey(null);
+      }
+    } catch (error) {
+      console.error('Error fetching API key:', error);
+      setApiKey(null);
+    }
+  };
+  
+  // Update useEffect to fetch API key
+  useEffect(() => {
+    const id = localStorage.getItem('currentUserId');
+    if (id) {
+      setUserId(id);
+      fetchDocuments(id);
+      fetchApiKey(id);
+    }
+  }, []);
+  
+  // Update the modal content to show API key
+  {modalContent && (
+    <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+      <div className="p-8">
+        <h2 className="text-xl font-bold mb-6">Deployment Instructions</h2>
+        <p className="mb-4">{modalContent.instructions}</p>
+        {modalContent.requires_api_key ? (
+          <>
+            <p className="text-yellow-500 mb-2">
+              Please update your Gemini API key in the API Access section to complete the deployment.
+            </p>
+            <div className="bg-gray-100 p-4 rounded-md mb-4">
+              <p className="text-sm font-medium mb-2">Your Gemini API Key:</p>
+              <p className="font-mono text-sm">
+                {apiKey || 'NO KEY FOUND'}
+              </p>
+            </div>
+            <p className="text-sm mb-6">
+              You can get your Gemini API key from{' '}
+              <a 
+                href="https://aistudio.google.com/app/apikey" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-600 underline"
+              >
+                here
+              </a>
+            </p>
+            <div className="flex justify-end space-x-4 mt-6">
+              <Button 
+                onClick={() => {
+                  setShowModal(false);
+                  window.location.href = '/api';
+                }}
+              >
+                {apiKey ? 'Update Gemini API Key' : 'Add Gemini API Key'}
+              </Button>
+              <Button variant="outline" onClick={() => setShowModal(false)}>
+                Close
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="font-mono text-sm mb-6">{modalContent.endpoint}</p>
+            <p className="text-green-500 mb-6">
+              Your document is successfully deployed and ready for queries.
+            </p>
+            <div className="flex justify-end mt-6">
+              <Button onClick={() => setShowModal(false)}>
+                Close
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </Modal>
+  )}
+
   return (
     <div className="container mx-auto py-6 space-y-6">
       <h1 className="text-3xl font-bold">Deployments</h1>
@@ -216,7 +304,7 @@ const DeploymentsPage = () => {
                             <h3 className="font-medium">
                               {document?.file_name || `Document ${docId}`}
                             </h3>
-                            <Badge>
+                            <Badge className="bg-green-500 hover:bg-green-600">
                               Active
                             </Badge>
                             {/* {deployment.requires_api_key === true && (

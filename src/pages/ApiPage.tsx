@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { addGeminiApiKey } from '@/services/api';
+import { addGeminiApiKey, getGeminiApiKey } from '@/services/api';
 import { Check, Clipboard, Key, RefreshCw } from "lucide-react";
 import { useEffect, useState } from 'react';
 
@@ -16,13 +16,34 @@ const ApiPage = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Get user ID from localStorage
     const id = localStorage.getItem('currentUserId');
-    if (id) setUserId(id);
+    console.log('Current User ID:', id);
     
-    // In a real implementation, you would fetch the user's API key
-    // For now, we'll use a placeholder
-    setApiKey("gemini_api_key_placeholder");
+    if (id) {
+      setUserId(id);
+      // Fetch the actual API key
+      const fetchApiKey = async () => {
+        try {
+          console.log('Fetching API key for user:', id);
+          const response = await getGeminiApiKey(id);
+          console.log('API Key Response:', response);
+          
+          if (response.status === 'success') {
+            console.log('Setting API key:', response.gemini_api_key);
+            setApiKey(response.gemini_api_key);
+          } else {
+            console.log('No API key found in response');
+            setApiKey("");
+          }
+        } catch (error) {
+          console.error("Error fetching API key:", error);
+          setApiKey("");
+        }
+      };
+      fetchApiKey();
+    } else {
+      console.log('No user ID found in localStorage');
+    }
   }, []);
 
   const copyToClipboard = (text: string) => {
@@ -132,7 +153,7 @@ const ApiPage = () => {
               type="password"
             />
             <p className="text-sm text-muted-foreground">
-              You can get a Gemini API key from the <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google AI Studio</a>.
+              You can get a Gemini API key from the <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google AI Studio</a>.
             </p>
           </div>
           <Button 
@@ -164,7 +185,6 @@ fetch("https://flexi-rag.azurewebsites.net/api/v1/deployed/{document_id}", {
   },
   body: JSON.stringify({
     query: "What are the main points in the document?",
-    api_key: "${apiKey ? "YOUR_SAVED_API_KEY" : "your-gemini-api-key"}"
   })
 })
 .then(response => response.json())

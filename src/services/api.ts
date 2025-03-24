@@ -170,7 +170,7 @@ export const queryDeployedDocument = async (documentId: string, query: string, a
 // API Key Management
 export const addGeminiApiKey = async (userId: string, apiKey: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/keys/`, {
+    const response = await fetch(`${API_BASE_URL}/keys`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

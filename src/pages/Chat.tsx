@@ -16,7 +16,8 @@ const Chat = () => {
   const [loading, setLoading] = useState<boolean>(false);
   
   const handleSendMessage = async (message: string) => {
-    if (!id) return;
+    const documentId = id || localStorage.getItem('currentDocumentId');
+    if (!documentId) return;
     
     const newUserMessage: Message = {
       id: Date.now().toString(),
@@ -29,7 +30,7 @@ const Chat = () => {
     setLoading(true);
     
     try {
-      const response = await queryDocument(id, message);
+      const response = await queryDocument(documentId, message);
       
       // Process the response to ensure markdown formatting is preserved
       const formattedAnswer = response.answer || "No answer provided";
@@ -71,7 +72,7 @@ const Chat = () => {
           <CardTitle>Ask questions about your document</CardTitle>
         </CardHeader>
         <CardContent>
-          {!id ? (
+          {!id && !localStorage.getItem('currentDocumentId') ? (
             <div className="text-center py-12">
               <Loader2 className="h-8 w-8 mx-auto mb-4 animate-spin text-muted-foreground" />
               <p>Document not found. Please select a valid document.</p>

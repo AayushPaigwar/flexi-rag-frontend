@@ -66,18 +66,19 @@ export function Sidebar({ className }: SidebarProps) {
           description: "You have been logged out of your account.",
         });
         
-        navigate('/');
+        // Force a page reload to ensure clean state
+        window.location.href = '/';
       } else {
         console.error('No user email found for logout');
         // Still clear storage and redirect even if API call fails
         localStorage.clear();
-        navigate('/');
+        window.location.href = '/';
       }
     } catch (error) {
       console.error("Logout error:", error);
       // Still clear storage and redirect even if API call fails
       localStorage.clear();
-      navigate('/');
+      window.location.href = '/';
       
       toast({
         title: "Logout completed",

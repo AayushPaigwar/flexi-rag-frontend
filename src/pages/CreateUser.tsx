@@ -31,7 +31,12 @@ const verifySchema = z.object({
   path: ["name"]
 });
 
-const CreateUser = () => {
+// Add this prop to your component
+interface CreateUserProps {
+  onAuthSuccess?: () => void;
+}
+
+const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -99,12 +104,19 @@ const CreateUser = () => {
       localStorage.setItem('currentUserName', response.user.name);
       localStorage.setItem('currentUserEmail', response.user.email);
 
+      // Call onAuthSuccess to update authentication state
+      if (onAuthSuccess) {
+        onAuthSuccess();
+      }
+
       toast({
         title: "Verification successful",
         description: response.message || "Email verified successfully",
       });
 
-      navigate(`/documents/${response.user.id}`);
+      // Navigate to dashboard instead of documents page
+      navigate('/dashboard', { replace: true });
+      
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to verify OTP";
       toast({

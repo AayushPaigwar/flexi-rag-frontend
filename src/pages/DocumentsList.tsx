@@ -1,12 +1,12 @@
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getUserDocuments, ApiDocument } from '@/services/api';
-import { MessageSquare, Upload, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ApiDocument, getUserDocuments } from '@/services/api';
+import { FileText, MessageSquare, Upload } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const DocumentsList = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -48,6 +48,17 @@ const DocumentsList = () => {
   };
   
   const handleChat = (documentId: string) => {
+    if (!documentId) {
+      toast({
+        title: "Error",
+        description: "Invalid document ID",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Store the document ID in localStorage for persistence
+    localStorage.setItem('currentDocumentId', documentId);
     navigate(`/chat/${documentId}`);
   };
   

@@ -133,7 +133,7 @@ export const queryDocument = async (documentId: string, query: string) => {
 // Deployment API
 export const deployDocument = async (documentId: string) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/documents/${documentId}/deploy/`, {
+    const response = await fetch(`${API_BASE_URL}/documents/${documentId}/deploy`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -58,6 +58,7 @@ export function Sidebar({ className }: SidebarProps) {
         localStorage.removeItem('currentUserEmail');
         localStorage.removeItem('currentUserName');
         localStorage.removeItem('currentUserId');
+        localStorage.removeItem('isAuthenticated'); // Add this line
         
         toast({
           title: "Logged out successfully",
@@ -65,7 +66,7 @@ export function Sidebar({ className }: SidebarProps) {
         });
         
         // Use router.push instead of navigate
-        router.push('/');
+        window.location.href = '/';
       } else {
         console.error('No user email found for logout');
         localStorage.clear();

@@ -118,8 +118,18 @@ const DeploymentsPage = () => {
     }
   };
 
+  // Add this helper function to format the endpoint URL correctly
+  const formatEndpointUrl = (endpoint: string) => {
+    if (endpoint.includes('/api/v1')) {
+      return endpoint;
+    }
+    return endpoint.replace('https://flexi-rag.azurewebsites.net/', 'https://flexi-rag.azurewebsites.net/api/v1/');
+  };
+
   const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
+    // Format the URL before copying to clipboard
+    const formattedUrl = formatEndpointUrl(text);
+    navigator.clipboard.writeText(formattedUrl);
     setCopied(id);
     toast({
       title: "Copied to clipboard",
@@ -200,7 +210,7 @@ const DeploymentsPage = () => {
           </>
         ) : (
           <>
-            <p className="font-mono text-sm mb-6">{modalContent.endpoint}</p>
+            <p className="font-mono text-sm mb-6">{formatEndpointUrl(modalContent.endpoint)}</p>
             <p className="text-green-500 mb-6">
               Your document is successfully deployed and ready for queries.
             </p>
@@ -307,11 +317,6 @@ const DeploymentsPage = () => {
                             <Badge className="bg-green-500 hover:bg-green-600">
                               Active
                             </Badge>
-                            {/* {deployment.requires_api_key === true && (
-                              <Badge variant="outline" className="text-yellow-500 border-yellow-500">
-                                Requires API Key
-                              </Badge>
-                            )} */}
                           </div>
                           <Button 
                             variant="ghost" 
@@ -322,7 +327,7 @@ const DeploymentsPage = () => {
                           </Button>
                         </div>
                         <p className="text-sm text-muted-foreground font-mono mt-1">
-                          {deployment.endpoint}
+                          {formatEndpointUrl(deployment.endpoint)}
                         </p>
                         {/* <div className="mt-2 flex items-center gap-2 text-sm">
                           <Globe size={14} />

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "@/lib/router"; // Import our custom router
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,7 +24,6 @@ import {
   Upload
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
   className?: string;
@@ -35,9 +35,8 @@ export function Sidebar({ className }: SidebarProps) {
   const [userName, setUserName] = useState<string>('');
   const [userId, setUserId] = useState<string>('');
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter(); // Use our custom router
   const { toast } = useToast();
-  const location = useLocation();
 
   useEffect(() => {
     const email = localStorage.getItem('currentUserEmail');
@@ -49,12 +48,11 @@ export function Sidebar({ className }: SidebarProps) {
     if (id) setUserId(id);
   }, []);
 
-  // Update the handleLogout function
+  // Update the handleLogout function to use router
   const handleLogout = async () => {
     try {
       if (userEmail) {
         console.log('Logging out user:', userEmail);
-        // await logoutUser(userEmail);
         
         // Clear local storage
         localStorage.removeItem('currentUserEmail');
@@ -66,29 +64,23 @@ export function Sidebar({ className }: SidebarProps) {
           description: "You have been logged out of your account.",
         });
         
-        // Force a page reload to ensure clean state
-        window.location.href = '/';
+        // Use router.push instead of navigate
+        router.push('/');
       } else {
         console.error('No user email found for logout');
-        // Still clear storage and redirect even if API call fails
         localStorage.clear();
-        window.location.href = '/';
+        router.push('/');
       }
     } catch (error) {
       console.error("Logout error:", error);
-      // Still clear storage and redirect even if API call fails
       localStorage.clear();
-      window.location.href = '/';
+      router.push('/');
       
       toast({
         title: "Logout completed",
         description: "You have been logged out of your account.",
       });
     }
-  };
-
-  const isActive = (path: string) => {
-    return location.pathname.startsWith(path);
   };
 
   return (
@@ -111,68 +103,62 @@ export function Sidebar({ className }: SidebarProps) {
       
       <div className="flex-1 py-4 overflow-y-auto">
         <nav className="space-y-1 px-2">
-          <Link to="/dashboard">
-            <Button 
-              variant={isActive('/dashboard') ? "secondary" : "ghost"} 
-              className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
-            >
-              <Home className="mr-2 h-5 w-5" />
-              {expanded && <span>Dashboard</span>}
-            </Button>
-          </Link>
+          <Button 
+            variant={router.isActive('/dashboard') ? "secondary" : "ghost"} 
+            className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
+            onClick={() => router.push('/dashboard')}
+          >
+            <Home className="mr-2 h-5 w-5" />
+            {expanded && <span>Dashboard</span>}
+          </Button>
           
-          <Link to={`/documents/${userId}`}>
-            <Button 
-              variant={isActive('/documents') ? "secondary" : "ghost"} 
-              className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
-            >
-              <FileText className="mr-2 h-5 w-5" />
-              {expanded && <span>Documents</span>}
-            </Button>
-          </Link>
+          <Button 
+            variant={router.isActive('/documents') ? "secondary" : "ghost"} 
+            className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
+            onClick={() => router.push(`/documents/${userId}`)}
+          >
+            <FileText className="mr-2 h-5 w-5" />
+            {expanded && <span>Documents</span>}
+          </Button>
           
-          <Link to="/upload">
-            <Button 
-              variant={isActive('/upload') ? "secondary" : "ghost"} 
-              className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
-            >
-              <Upload className="mr-2 h-5 w-5" />
-              {expanded && <span>Upload</span>}
-            </Button>
-          </Link>
+          <Button 
+            variant={router.isActive('/upload') ? "secondary" : "ghost"} 
+            className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
+            onClick={() => router.push('/upload')}
+          >
+            <Upload className="mr-2 h-5 w-5" />
+            {expanded && <span>Upload</span>}
+          </Button>
           
-          <Link to="/deployments">
-            <Button 
-              variant={isActive('/deployments') ? "secondary" : "ghost"} 
-              className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
-            >
-              <Server className="mr-2 h-5 w-5" />
-              {expanded && <span>Deployments</span>}
-            </Button>
-          </Link>
+          <Button 
+            variant={router.isActive('/deployments') ? "secondary" : "ghost"} 
+            className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
+            onClick={() => router.push('/deployments')}
+          >
+            <Server className="mr-2 h-5 w-5" />
+            {expanded && <span>Deployments</span>}
+          </Button>
           
-          <Link to="/api">
-            <Button 
-              variant={isActive('/api') ? "secondary" : "ghost"} 
-              className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
-            >
-              <Key className="mr-2 h-5 w-5" />
-              {expanded && <span>API Access</span>}
-            </Button>
-          </Link>
+          <Button 
+            variant={router.isActive('/api') ? "secondary" : "ghost"} 
+            className={`w-full justify-start mb-1 ${expanded ? '' : 'justify-center'}`}
+            onClick={() => router.push('/api')}
+          >
+            <Key className="mr-2 h-5 w-5" />
+            {expanded && <span>API Access</span>}
+          </Button>
         </nav>
       </div>
       
       <div className="p-4 border-t">
-        <Link to="/settings">
-          <Button 
-            variant={isActive('/settings') ? "secondary" : "ghost"} 
-            className={`w-full justify-start mb-4 ${expanded ? '' : 'justify-center'}`}
-          >
-            <Settings className="mr-2 h-5 w-5" />
-            {expanded && <span>Settings</span>}
-          </Button>
-        </Link>
+        <Button 
+          variant={router.isActive('/settings') ? "secondary" : "ghost"} 
+          className={`w-full justify-start mb-4 ${expanded ? '' : 'justify-center'}`}
+          onClick={() => router.push('/settings')}
+        >
+          <Settings className="mr-2 h-5 w-5" />
+          {expanded && <span>Settings</span>}
+        </Button>
         
         <div className={`flex items-center ${expanded ? 'justify-between' : 'justify-center'} mb-2`}>
           {expanded && (

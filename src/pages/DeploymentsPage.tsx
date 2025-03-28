@@ -384,7 +384,7 @@ const DeploymentsPage = () => {
                           window.location.href = '/api';
                         }}
                       >
-                        Add Gemini API Key
+                        {apiKey ? 'Update Gemini API Key' : 'Add Gemini API Key'}
                       </Button>
                       <Button variant="outline" onClick={() => setShowModal(false)}>
                         Close

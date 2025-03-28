@@ -13,8 +13,15 @@
       const path = window.location.pathname;
       // Store it in sessionStorage
       sessionStorage.setItem('lastPath', path);
+
+      // Handle 404 errors by redirecting to index.html
+      if (window.location.href.indexOf('?/') !== -1 || window.location.href.indexOf('&/') !== -1) {
+        window.location.href = '/';
+      }
     })();
   </script>
+  <!-- Add base tag for SPA routing -->
+  <base href="/" />
 </head>
 
 <body>

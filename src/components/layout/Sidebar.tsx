@@ -54,28 +54,25 @@ export function Sidebar({ className }: SidebarProps) {
       if (userEmail) {
         console.log('Logging out user:', userEmail);
         
-        // Clear local storage
-        localStorage.removeItem('currentUserEmail');
-        localStorage.removeItem('currentUserName');
-        localStorage.removeItem('currentUserId');
-        localStorage.removeItem('isAuthenticated'); // Add this line
+        // Clear ALL local storage completely
+        localStorage.clear();
         
         toast({
           title: "Logged out successfully",
           description: "You have been logged out of your account.",
         });
         
-        // Use router.push instead of navigate
-        window.location.href = '/';
+        // Force a complete page reload to reset all React state
+        window.location.replace('/');
       } else {
         console.error('No user email found for logout');
         localStorage.clear();
-        router.push('/');
+        window.location.replace('/');
       }
     } catch (error) {
       console.error("Logout error:", error);
       localStorage.clear();
-      router.push('/');
+      window.location.replace('/');
       
       toast({
         title: "Logout completed",

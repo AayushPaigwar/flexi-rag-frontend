@@ -57,32 +57,31 @@ export function ChatInterface({
 
   return (
     <div className={cn(
-      "flex flex-col bg-white rounded-xl border border-border/40 shadow-sm overflow-hidden h-[600px]",
+      "flex flex-col bg-background/95 backdrop-blur-md rounded-xl border shadow-lg",
+      "h-[600px] transition-all duration-300 ease-in-out",
       className
     )}>
-      <div className="p-4 border-b border-border flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="p-2 bg-primary/10 rounded-full">
-            <Bot size={18} className="text-primary" />
+      <div className="p-4 border-b bg-muted/20 backdrop-blur-sm rounded-t-xl">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-full animate-pulse">
+            <Bot size={20} className="text-primary" />
           </div>
-          <h3 className="font-medium">{modelName}</h3>
-        </div>
-        <div className="flex gap-2">
-          {/* <Button variant="ghost" size="icon">
-            <Plus size={18} />
-          </Button> */}
+          <div>
+            <h3 className="font-medium text-lg">{modelName}</h3>
+            <p className="text-sm text-muted-foreground">Ready to assist you</p>
+          </div>
         </div>
       </div>
       
       <ScrollArea className="flex-1 p-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-6 animate-fade-in">
-            <div className="p-4 bg-primary/10 rounded-full mb-4">
-              <Bot size={24} className="text-primary" />
+            <div className="p-4 bg-primary/10 rounded-full mb-4 animate-float">
+              <Bot size={32} className="text-primary" />
             </div>
-            <h3 className="text-lg font-medium mb-2">Welcome to FlexiRAG</h3>
+            <h3 className="text-xl font-medium mb-2">Welcome to FlexiRAG</h3>
             <p className="text-muted-foreground max-w-sm">
-              This AI assistant is powered by your custom RAG model. Ask any questions about your data.
+              Your AI assistant is ready to help. Ask any questions about your documents.
             </p>
           </div>
         ) : (
@@ -95,36 +94,33 @@ export function ChatInterface({
         )}
       </ScrollArea>
       
-      <div className="p-4 border-t border-border">
-        <div className="flex gap-2">
-
-          
-          {/* <Button variant="ghost" size="icon" className="shrink-0">
-            <Paperclip size={18} />
-          </Button> */}
-          <div className="relative flex-1">
-            <Textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask a question..."
-              className="resize-none pr-10 py-2 min-h-[2.5rem] max-h-[8rem]"
-              disabled={isLoading}
-            />
-            <Button
-              size="icon"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2"
-              onClick={handleSendMessage}
-              disabled={isLoading || !input.trim()}
-            >
-              {isLoading ? (
-                <Loader2 size={18} className="animate-spin" />
-              ) : (
-                <Send size={18} />
-              )}
-            </Button>
-          </div>
+      <div className="p-4 border-t bg-muted/20 backdrop-blur-sm rounded-b-xl">
+        <div className="relative">
+          <Textarea
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask a question..."
+            className="resize-none pr-12 py-3 min-h-[2.5rem] max-h-[8rem] rounded-xl border-muted"
+            disabled={isLoading}
+          />
+          <Button
+            size="icon"
+            className={cn(
+              "absolute right-2 top-1/2 transform -translate-y-1/2",
+              "transition-all duration-200",
+              isLoading ? "animate-pulse" : "hover:scale-105"
+            )}
+            onClick={handleSendMessage}
+            disabled={isLoading || !input.trim()}
+          >
+            {isLoading ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <Send size={18} />
+            )}
+          </Button>
         </div>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import { supabase } from "@/lib/supabase";
+
 /**
  * API Service for communicating with the FlexiRAG backend
  */
@@ -21,23 +23,37 @@ const handleApiError = async (response: Response) => {
 };
 
 // User API
+
 export const signInWithOtp = async (email: string) => {
   try {
     if (!email || !email.includes('@')) {
       throw new Error("Invalid email address provided.");
     }
 
-    const response = await fetch(`${API_BASE_URL}/users/signin-otp/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
+    const { data, error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin,
+      }
     });
 
-    return handleApiError(response);
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // Check if user exists in Supabase
+    const { data: userExists, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    return {
+      message: 'OTP sent to email. Please check your inbox.',
+      is_new_user: !userExists && !userError
+    };
   } catch (error) {
-    console.error("Sign in OTP error:", error); // Log error
+    console.error("Sign in OTP error:", error);
     throw error;
   }
 };
@@ -49,17 +65,59 @@ export const verifyOtp = async (data: {
   phone_number?: string;
 }) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/verify-otp/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
+    // Verify OTP with Supabase
+    const { data: authData, error } = await supabase.auth.verifyOtp({
+      email: data.email,
+      token: data.token,
+      type: 'email'
     });
 
-    return handleApiError(response);
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    // Get user data
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', data.email)
+      .single();
+
+    // If user doesn't exist and name is provided, create a new user
+    if ((!userData || userError) && data.name) {
+      const { data: newUser, error: createError } = await supabase
+        .from('users')
+        .insert([
+          { 
+            name: data.name, 
+            email: data.email, 
+            phone_number: data.phone_number || null,
+            auth_id: authData.user?.id
+          }
+        ])
+        .select()
+        .single();
+
+      if (createError) {
+        throw new Error(createError.message);
+      }
+
+      return {
+        message: 'User created and verified successfully',
+        user: newUser
+      };
+    }
+
+    return {
+      message: 'Email verified successfully',
+      user: userData || {
+        id: authData.user?.id,
+        email: data.email,
+        name: data.name || data.email.split('@')[0]
+      }
+    };
   } catch (error) {
-    console.error("Verify OTP error:", error); // Log error
+    console.error("Verify OTP error:", error);
     throw error;
   }
 };

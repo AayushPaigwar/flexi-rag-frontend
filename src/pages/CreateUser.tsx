@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from '@/hooks/use-toast';
 import { signInWithOtp, verifyOtp } from '@/services/api';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Bot, Key, Loader, Mail, Sparkles } from 'lucide-react';
+import { Key, Loader, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
@@ -62,13 +62,15 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
       setCurrentEmail(values.email);
       setIsVerifying(true);
       setIsNewUser(response.is_new_user || false);
+      // Add this line to make isNewUser available to schema validation
       window.isNewUser = response.is_new_user || false;
       
-      // Clear the token field completely to ensure it's empty
-      verifyForm.setValue("email", values.email);
-      verifyForm.setValue("token", "");
-      verifyForm.setValue("name", "");
-      verifyForm.setValue("phone_number", "");
+      verifyForm.reset({
+        email: values.email,
+        token: "",
+        name: "",
+        phone_number: ""
+      });
 
       toast({
         title: "OTP sent",
@@ -128,98 +130,77 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-block p-4 rounded-full bg-primary/10 mb-4">
-            <Bot className="w-10 h-10 text-primary animate-pulse" />
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/50 bg-clip-text text-transparent mb-2">
-            FlexiRAG
-          </h1>
-          <p className="text-muted-foreground">Your AI-powered document assistant</p>
-        </div>
-
-        <Card className="border-2 shadow-lg backdrop-blur-sm bg-background/95">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              {isVerifying ? (
-                <>
-                  <Key className="w-5 h-5 text-primary" />
-                  Verify OTP
-                </>
-              ) : (
-                <>
-                  <Mail className="w-5 h-5 text-primary" />
-                  Sign In
-                </>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!isVerifying ? (
-              <Form {...loginForm}>
-                <form onSubmit={loginForm.handleSubmit(onRequestLoginOtp)} className="space-y-4">
-                  <FormField
-                    control={loginForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              {...field}
-                              type="email"
-                              placeholder="Enter your email"
-                              className="pl-10 transition-all duration-200 border-muted-foreground/20 hover:border-primary/50 focus:border-primary"
-                            />
-                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+    <div className="container max-w-md mx-auto py-10">
+      <Card>
+        <CardHeader>
+          <CardTitle>FlexiRAG: Make your Custom RAG Agents</CardTitle>
+          <CardDescription>
+            {!isVerifying 
+              ? "Sign in to start using the FlexiRAG platform"
+              : isNewUser 
+                ? "Complete your registration"
+                : "Enter verification code"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!isVerifying ? (
+            <Form {...loginForm}>
+              <form className="space-y-6">
+                <FormField
+                  control={loginForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="john@example.com" type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button 
+                  type="button" 
+                  className="w-full" 
+                  onClick={onRequestLoginOtp}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Mail className="mr-2 h-4 w-4" />
+                  )}
+                  {isLoading ? "Sending OTP..." : "Send OTP to Email"}
+                </Button>
+              </form>
+            </Form>
+          ) : (
+            <Form {...verifyForm}>
+              <form onSubmit={verifyForm.handleSubmit(onVerify)} className="space-y-6">
+                <div className="space-y-2">
+                  <FormLabel>Email</FormLabel>
+                  <Input 
+                    type="email" 
+                    value={currentEmail}
+                    disabled
+                    className="bg-gray-100"
                   />
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-all duration-200"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <Loader className="w-4 h-4 animate-spin mr-2" />
-                    ) : (
-                      <Sparkles className="w-4 h-4 mr-2" />
-                    )}
-                    {isLoading ? "Sending OTP..." : "Get OTP"}
-                  </Button>
-                </form>
-              </Form>
-            ) : (
-              <Form {...verifyForm}>
-                <form onSubmit={verifyForm.handleSubmit(onVerify)} className="space-y-4">
-                  <FormField
-                    control={verifyForm.control}
-                    name="token"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>OTP Code</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              {...field}
-                              placeholder="Enter OTP"
-                              className="pl-10 text-center tracking-[0.5em] font-mono transition-all duration-200"
-                            />
-                            <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {isNewUser && (
+                </div>
+                <FormField
+                  control={verifyForm.control}
+                  name="token"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>OTP Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter OTP" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {isNewUser && (
+                  <>
                     <FormField
                       control={verifyForm.control}
                       name="name"
@@ -227,51 +208,61 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
                         <FormItem>
                           <FormLabel>Name</FormLabel>
                           <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Your name"
-                              className="transition-all duration-200"
-                            />
+                            <Input placeholder="John Doe" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  )}
-
-                  <div className="space-y-2">
-                    <Button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-all duration-200"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <Loader className="w-4 h-4 animate-spin mr-2" />
-                      ) : (
-                        <Key className="w-4 h-4 mr-2" />
+                    
+                    <FormField
+                      control={verifyForm.control}
+                      name="phone_number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number (Optional)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="+1234567890" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                      {isLoading ? "Verifying..." : "Verify OTP"}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="w-full hover:bg-primary/5"
-                      onClick={() => setIsVerifying(false)}
-                      disabled={isLoading}
-                    >
-                      Back to Sign In
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            )}
-          </CardContent>
-        </Card>
-
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          By signing in, you agree to our Terms of Service and Privacy Policy
-        </p>
-      </div>
+                    />
+                  </>
+                )}
+                <div className="flex space-x-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      setIsVerifying(false);
+                      setIsNewUser(false);
+                    }}
+                    className="flex-1"
+                  >
+                    Back
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    className="flex-1"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Key className="mr-2 h-4 w-4" />
+                    )}
+                    {isLoading ? "Verifying..." : isNewUser ? "Complete Registration" : "Verify OTP"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-center text-sm text-muted-foreground">
+          FlexiRAG - Retrieve information from your documents
+        </CardFooter>
+      </Card>
     </div>
   );
 };
@@ -284,6 +275,3 @@ declare global {
     isNewUser: boolean;
   }
 }
-
-
-// test change

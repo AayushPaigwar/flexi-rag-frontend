@@ -1,9 +1,9 @@
+import { AuthController } from '@/auth/auth.controller';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from '@/hooks/use-toast';
-import { signInWithOtp, verifyOtp } from '@/services/api';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Key, Loader, Mail } from 'lucide-react';
 import { useState } from 'react';
@@ -43,6 +43,7 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [currentEmail, setCurrentEmail] = useState('');
   const [isNewUser, setIsNewUser] = useState(false);
+  const authController = new AuthController();
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -58,23 +59,24 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
     const values = loginForm.getValues();
     setIsLoading(true);
     try {
-      const response = await signInWithOtp(values.email);
+      const response = await authController.signInWithOtp({ email: values.email });
       setCurrentEmail(values.email);
       setIsVerifying(true);
       setIsNewUser(response.is_new_user || false);
-      // Add this line to make isNewUser available to schema validation
       window.isNewUser = response.is_new_user || false;
       
+      // Only reset the form fields that are needed based on user status
       verifyForm.reset({
         email: values.email,
         token: "",
-        name: "",
-        phone_number: ""
+        ...(response.is_new_user ? { name: "", phone_number: "" } : {})
       });
 
       toast({
-        title: "OTP sent",
-        description: response.message || "Please check your email for OTP",
+        title: response.is_new_user ? "Welcome!" : "Welcome back!",
+        description: response.is_new_user 
+          ? "Please complete your registration with the OTP sent to your email"
+          : "Please enter the OTP sent to your email",
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to send OTP";
@@ -98,13 +100,12 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
         phone_number: isNewUser ? (values.phone_number || '') : ''
       };
 
-      const response = await verifyOtp(dataToSend);
+      const response = await authController.verifyOtp(dataToSend);
 
-      localStorage.setItem('currentUserId', response.user.id);
-      localStorage.setItem('currentUserName', response.user.name);
-      localStorage.setItem('currentUserEmail', response.user.email);
+      localStorage.setItem('currentUserId', response.user.id || '');
+      localStorage.setItem('currentUserName', response.user.name || '');
+      localStorage.setItem('currentUserEmail', response.user.email || '');
 
-      // Call onAuthSuccess to update authentication state
       if (onAuthSuccess) {
         onAuthSuccess();
       }
@@ -114,7 +115,6 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
         description: response.message || "Email verified successfully",
       });
 
-      // Navigate to dashboard instead of documents page
       navigate('/dashboard', { replace: true });
       
     } catch (error) {
@@ -139,7 +139,7 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
               ? "Sign in to start using the FlexiRAG platform"
               : isNewUser 
                 ? "Complete your registration"
-                : "Enter verification code"}
+                : "Enter verification code to sign in"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -214,7 +214,6 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
                         </FormItem>
                       )}
                     />
-                    
                     <FormField
                       control={verifyForm.control}
                       name="phone_number"
@@ -252,7 +251,7 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
                     ) : (
                       <Key className="mr-2 h-4 w-4" />
                     )}
-                    {isLoading ? "Verifying..." : isNewUser ? "Complete Registration" : "Verify OTP"}
+                    {isLoading ? "Verifying..." : isNewUser ? "Complete Registration" : "Sign In"}
                   </Button>
                 </div>
               </form>

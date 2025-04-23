@@ -21,65 +21,45 @@ const handleApiError = async (response: Response) => {
 };
 
 // User API
-export const signInWithOtp = async (email: string) => {
-  try {
-    if (!email || !email.includes('@')) {
-      throw new Error("Invalid email address provided.");
-    }
-
-    const response = await fetch(`${API_BASE_URL}/users/signin-otp/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    return handleApiError(response);
-  } catch (error) {
-    console.error("Sign in OTP error:", error); // Log error
-    throw error;
-  }
-};
-
-export const verifyOtp = async (data: { 
-  email: string; 
-  token: string; 
-  name?: string;
-  phone_number?: string;
-}) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/verify-otp/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    return handleApiError(response);
-  } catch (error) {
-    console.error("Verify OTP error:", error); // Log error
-    throw error;
-  }
-};
-
-// Update the logoutUser function with the correct endpoint
-// export const logoutUser = async (email: string) => {
+// export const signInWithOtp = async (email: string) => {
 //   try {
-//     console.log("Logging out user:", email);
-    
-//     const response = await fetch(`${API_BASE_URL}/users/logout/`, {
+//     if (!email || !email.includes('@')) {
+//       throw new Error("Invalid email address provided.");
+//     }
+
+//     const response = await fetch(`${API_BASE_URL}/users/signin-otp/`, {
 //       method: 'POST',
 //       headers: {
 //         'Content-Type': 'application/json',
 //       },
 //       body: JSON.stringify({ email }),
 //     });
-    
+
 //     return handleApiError(response);
 //   } catch (error) {
-//     console.error("Logout user error:", error);
+//     console.error("Sign in OTP error:", error); // Log error
+//     throw error;
+//   }
+// };
+
+// export const verifyOtp = async (data: { 
+//   email: string; 
+//   token: string; 
+//   name?: string;
+//   phone_number?: string;
+// }) => {
+//   try {
+//     const response = await fetch(`${API_BASE_URL}/users/verify-otp/`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(data),
+//     });
+
+//     return handleApiError(response);
+//   } catch (error) {
+//     console.error("Verify OTP error:", error); // Log error
 //     throw error;
 //   }
 // };
@@ -258,14 +238,12 @@ export const getAvailableDocuments = async (userId: string) => {
   }
 };
 
-// Add this interface
 interface GeminiKeyResponse {
   status: string;
   gemini_api_key: string;
   message: string;
 }
 
-// Add this function
 export const getGeminiApiKey = async (userId: string): Promise<GeminiKeyResponse> => {
 
   console.log("getGeminiApiKey Userid :", userId);

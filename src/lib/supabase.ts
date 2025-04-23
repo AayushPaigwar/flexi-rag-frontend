@@ -4,3 +4,25 @@ const supabaseUrl = 'https://gtbrnrmnqtjzfzkqtmzm.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0YnJucm1ucXRqemZ6a3F0bXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE2Nzk1OTYsImV4cCI6MjA1NzI1NTU5Nn0.9KAD9JbnTD1gUOCbyRosQV4RDUWWIg5PSzLTUlvRYpY'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
+
+// Add authentication methods
+export const signInWithEmail = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+  return { data, error };
+};
+
+export const signUpWithEmail = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+  return { data, error };
+};
+
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut();
+  return { error };
+};

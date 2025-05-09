@@ -1,3 +1,4 @@
+
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
@@ -7,6 +8,7 @@ import CreateUser from "@/pages/CreateUser";
 import Dashboard from "@/pages/Dashboard";
 import DeploymentsPage from "@/pages/DeploymentsPage";
 import DocumentsList from "@/pages/DocumentsList";
+import LandingPage from "@/pages/LandingPage";
 import NotFound from "@/pages/NotFound";
 import SettingsPage from "@/pages/SettingsPage";
 import UploadDocument from "@/pages/UploadDocument";
@@ -87,18 +89,17 @@ function AppContent({
 }) {
   const location = useLocation();
 
-  // Only redirect to dashboard if we're on the root path
-  if (location.pathname === "/" && isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
   return (
     <div className="flex h-screen">
       {isAuthenticated && <Sidebar className="h-screen" />}
       <main className={`flex-1 overflow-auto ${isAuthenticated ? "ml-0" : ""}`}>
         <Routes>
+          {/* Landing page as the default entry point */}
+          <Route path="/" element={<LandingPage />} />
+          
+          {/* Login/Create user page */}
           <Route
-            path="/"
+            path="/login"
             element={
               isAuthenticated ? (
                 <Navigate to="/dashboard" replace />
@@ -204,7 +205,7 @@ const ProtectedRoute = ({
   const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace state={{ from: location }} />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   return <>{children}</>;

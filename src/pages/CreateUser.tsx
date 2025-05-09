@@ -152,16 +152,16 @@ const CreateUser = ({ onAuthSuccess }: CreateUserProps) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4">
       <Card className="max-w-md w-full shadow-lg border-0 overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-primary to-secondary text-white p-8">
+        <CardHeader className="bg-gradient-to-br from-blue-100 to-blue-200 text-white p-8">
           <div className="flex justify-center mb-6">
-            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
-              <FileText className="h-6 w-6 text-white" />
+            <div className="h-12 w-12 rounded-full bg-blue-300/20 flex items-center justify-center border border-gray-300">
+              <FileText className="h-6 w-6 text-blue-600" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-center">
+          <CardTitle className="text-2xl font-bold text-center text-blue-600">
             FlexiRAG
           </CardTitle>
-          <CardDescription className="text-white/80 text-center mt-2">
+          <CardDescription className="text-white/80 text-center mt-2 text-blue-600">
             {!isVerifying
               ? "Sign in to start using the FlexiRAG platform"
               : isNewUser

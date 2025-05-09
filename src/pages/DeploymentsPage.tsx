@@ -247,7 +247,7 @@ const DeploymentsPage = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <h1 className="text-3xl font-bold">Deployments</h1>
+      <h1 className="text-3xl font-bold text-blue-500">Deployments</h1>
       <p className="text-muted-foreground">
         Deploy your documents as API endpoints and manage your deployments.
       </p>

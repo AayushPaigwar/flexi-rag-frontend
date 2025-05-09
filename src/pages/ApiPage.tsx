@@ -1,10 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { addGeminiApiKey, getGeminiApiKey } from '@/services/api';
+import { addGeminiApiKey, getGeminiApiKey } from "@/services/api";
 import { Check, Clipboard, Key, RefreshCw } from "lucide-react";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 const ApiPage = () => {
   const [apiKey, setApiKey] = useState<string>("");
@@ -16,23 +22,23 @@ const ApiPage = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const id = localStorage.getItem('currentUserId');
-    console.log('Current User ID:', id);
-    
+    const id = localStorage.getItem("currentUserId");
+    console.log("Current User ID:", id);
+
     if (id) {
       setUserId(id);
       // Fetch the actual API key
       const fetchApiKey = async () => {
         try {
-          console.log('Fetching API key for user:', id);
+          console.log("Fetching API key for user:", id);
           const response = await getGeminiApiKey(id);
-          console.log('API Key Response:', response);
-          
-          if (response.status === 'success') {
-            console.log('Setting API key:', response.gemini_api_key);
+          console.log("API Key Response:", response);
+
+          if (response.status === "success") {
+            console.log("Setting API key:", response.gemini_api_key);
             setApiKey(response.gemini_api_key);
           } else {
-            console.log('No API key found in response');
+            console.log("No API key found in response");
             setApiKey("");
           }
         } catch (error) {
@@ -42,7 +48,7 @@ const ApiPage = () => {
       };
       fetchApiKey();
     } else {
-      console.log('No user ID found in localStorage');
+      console.log("No user ID found in localStorage");
     }
   }, []);
 
@@ -61,7 +67,7 @@ const ApiPage = () => {
       toast({
         title: "Error",
         description: "Please enter a valid API key",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -80,7 +86,7 @@ const ApiPage = () => {
       toast({
         title: "Error",
         description: "Failed to save API key. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -93,7 +99,7 @@ const ApiPage = () => {
       <p className="text-muted-foreground">
         Manage your Gemini API key for document deployments.
       </p>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Your Gemini API Key</CardTitle>
@@ -105,22 +111,22 @@ const ApiPage = () => {
           {apiKey ? (
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Input 
-                  value={apiKey} 
-                  readOnly 
+                <Input
+                  value={apiKey}
+                  readOnly
                   type={showApiKey ? "text" : "password"}
                   className="font-mono"
                 />
-                <Button 
-                  variant="outline" 
-                  size="icon" 
+                <Button
+                  variant="outline"
+                  size="icon"
                   onClick={() => copyToClipboard(apiKey)}
                 >
                   {copied ? <Check size={16} /> : <Clipboard size={16} />}
                 </Button>
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setShowApiKey(!showApiKey)}
                 className="text-sm"
               >
@@ -129,18 +135,19 @@ const ApiPage = () => {
             </div>
           ) : (
             <p className="text-muted-foreground">
-              You haven't added a Gemini API key yet. Add one below to enable document deployments.
+              You haven't added a Gemini API key yet. Add one below to enable
+              document deployments.
             </p>
           )}
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>{apiKey ? "Update" : "Add"} Gemini API Key</CardTitle>
           <CardDescription>
-            {apiKey 
-              ? "Update your existing Gemini API key" 
+            {apiKey
+              ? "Update your existing Gemini API key"
               : "Add your Gemini API key to enable document deployments"}
           </CardDescription>
         </CardHeader>
@@ -153,20 +160,33 @@ const ApiPage = () => {
               type="password"
             />
             <p className="text-sm text-muted-foreground">
-              You can get a Gemini API key from the <a href="https://ai.google.dev/gemini-api/docs/api-key" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google AI Studio</a>.
+              You can get a Gemini API key from the{" "}
+              <a
+                href="https://ai.google.dev/gemini-api/docs/api-key"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline text-blue-600"
+              >
+                Google AI Studio
+              </a>
+              .
             </p>
           </div>
-          <Button 
-            onClick={handleSaveApiKey} 
+          <Button
+            onClick={handleSaveApiKey}
             disabled={isLoading || !newApiKey.trim()}
             className="flex items-center gap-2"
           >
-            {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Key size={16} />}
+            {isLoading ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Key size={16} />
+            )}
             {apiKey ? "Update API Key" : "Save API Key"}
           </Button>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>API Usage Instructions</CardTitle>
@@ -177,7 +197,7 @@ const ApiPage = () => {
         <CardContent>
           <div className="bg-muted p-4 rounded-md overflow-x-auto">
             <pre className="text-sm">
-{`// Example using fetch
+              {`// Example using fetch
 fetch("https://flexi-rag.azurewebsites.net/api/v1/deployed/{document_id}", {
   method: "POST",
   headers: {

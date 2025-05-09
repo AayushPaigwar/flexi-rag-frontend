@@ -11,14 +11,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FileItem, FileUpload } from "@/components/upload/FileUpload";
-import { mockCurrentUser, mockUploadedFiles } from "@/data/mock-data";
+// import { mockCurrentUser, mockUploadedFiles } from "@/data/mock-data";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, FileText, Upload as UploadIcon } from "lucide-react";
 import { useState } from "react";
 
 const Upload = () => {
   const { toast } = useToast();
-  const [files, setFiles] = useState<FileItem[]>(mockUploadedFiles);
+  const [files, setFiles] = useState<FileItem[]>();
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
 
   const handleFilesSelected = (selectedFiles: File[]) => {
@@ -147,8 +147,8 @@ const Upload = () => {
                   Upload Summary
                 </h4>
                 <ul className="text-sm space-y-1 text-blue-600">
-                  <li>User: {mockCurrentUser.name}</li>
-                  <li>User ID: {mockCurrentUser.id}</li>
+                  {/* <li>User: {mockCurrentUser.name}</li>
+                  <li>User ID: {mockCurrentUser.id}</li> */}
                   <li>Files to upload: {files.length}</li>
                   <li>
                     Supported formats: PDF, TXT, DOCX, CSV, XLSX, XLS, JSON

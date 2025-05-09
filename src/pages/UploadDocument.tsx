@@ -143,7 +143,7 @@ const UploadDocument = () => {
       <div className="container mx-auto py-8 px-4">
         <div className="flex justify-center items-center h-full">
           <Card className="max-w-3xl w-full shadow-lg border-blue-200 overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-500 text-white p-8">
+            <CardHeader className="bg-gradient-to-r from-blue-500 to-blue-400 text-white p-8">
               <CardTitle className="text-2xl font-bold">
                 Upload Your Document
               </CardTitle>

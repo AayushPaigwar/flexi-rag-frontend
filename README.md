@@ -1,69 +1,141 @@
-# Welcome to your Lovable project
+# FlexiRAG - Flexible Retrieval Augmented Generation
 
-## Project info
+FlexiRAG is a powerful document RAG (Retrieval Augmented Generation) platform that allows you to upload, deploy, and query documents through an intuitive interface and API.
 
-**URL**: https://lovable.dev/projects/7af8e6fc-3d75-449f-b6e0-1af108445ab7,,
+## 🚀 Features
 
-## How can I edit this code?
+* **Document Management**: Upload and manage various document types
+* **RAG Deployments**: Deploy documents as queryable API endpoints
+* **Chat Interface**: Interact with your documents through a conversational UI
+* **API Access**: Programmatically access your deployed documents
+* **Gemini Integration**: Leverage Google's Gemini AI for document understanding
 
-There are several ways of editing your application.
+## 🛠️ Tech Stack
 
-**Use Lovable**..
+This project is built with modern web technologies:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7af8e6fc-3d75-449f-b6e0-1af108445ab7) and start prompting.
+* **Frontend**:
+  * React with TypeScript
+  * Vite for fast development and building
+  * Tailwind CSS for styling
+  * shadcn/ui for UI components
+  * React Router for navigation
 
-Changes made via Lovable will be committed automatically to this repo.
+* **Backend**:
+  * FastAPI (Python)
+  * Supabase for authentication and storage
+  * Google Gemini AI for document processing
 
-**Use your preferred IDE**
+## 📋 Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+* Node.js & npm (or bun)
+* Python 3.8+ (for backend development)
+* Gemini API key (for document deployments)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🚦 Getting Started
 
-Follow these steps:
+### Frontend Setup
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. Clone the repository:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+git clone <YOUR_REPOSITORY_URL>
+cd flexi-rag-nest
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. Install dependencies:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
+```
+
+3. Start the development server:
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The application will be available at <http://localhost:8080>
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Backend Setup
 
-**Use GitHub Codespaces**
+1. Install Python dependencies:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```bash
+pip install -r requirements.txt
+```
 
-## What technologies are used for this project?
+2. Set up environment variables in `.env`:
 
-This project is built with .
+```
+GEMINI_API_KEY=your_key
+SUPABASE_URL=your_url
+SUPABASE_KEY=your_key
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+3. Run the API:
 
-## How can I deploy this project?
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-Simply open [Lovable](https://lovable.dev/projects/7af8e6fc-3d75-449f-b6e0-1af108445ab7) and click on Share -> Publish.
+## 📚 Documentation
 
-## I want to use a custom domain - is that possible?
+The API documentation is available at:
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+* Swagger UI: `/docs`
+* ReDoc: `/redoc`
+
+## 🔄 Workflow
+
+1. Create an account or sign in
+2. Upload documents to your library
+3. Deploy documents as API endpoints
+4. Query documents through the chat interface or API
+5. Manage deployments and API keys in the settings
+
+## 🔑 API Usage
+
+Once you've deployed a document, you can query it using the provided endpoint:
+
+```http
+POST https://flexi-rag.azurewebsites.net/api/v1/deployed/{document_id}
+Content-Type: application/json
+
+{
+  "query": "Your question about the document",
+  "api_key": "your_gemini_api_key" // Optional, if configured in settings
+}
+```
+
+## 🧩 Project Structure
+
+```
+flexi-rag-nest/
+├── src/
+│   ├── components/     # UI components
+│   ├── pages/          # Application pages
+│   ├── services/       # API services
+│   ├── hooks/          # Custom React hooks
+│   ├── lib/            # Utility functions
+│   └── App.tsx         # Main application component
+├── public/             # Static assets
+└── ...                 # Configuration files
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🔗 Links
+
+* [Backend API](https://github.com/aayushpaigwar/flexi-rag-backend)
+* [API Documentation](https://flexi-rag.azurewebsites.net/docs)
+
+---
+
+Built with ❤️ using modern web technologies

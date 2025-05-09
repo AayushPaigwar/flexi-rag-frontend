@@ -1,6 +1,5 @@
-
-import React, { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
+import { ReactNode } from "react";
 
 interface PageHeaderProps {
   title: string;
@@ -9,12 +8,24 @@ interface PageHeaderProps {
   className?: string;
 }
 
-export function PageHeader({ title, description, children, className }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  children,
+  className,
+}: PageHeaderProps) {
   return (
-    <div className={cn("mb-8 flex flex-col space-y-2 animate-slide-down", className)}>
+    <div
+      className={cn(
+        "mb-8 flex flex-col space-y-2 animate-slide-down",
+        className
+      )}
+    >
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-foreground tracking-tight">{title}</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-blue-600">
+            {title}
+          </h1>
           {description && (
             <p className="text-muted-foreground mt-1">{description}</p>
           )}

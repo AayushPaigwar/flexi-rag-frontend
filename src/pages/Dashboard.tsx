@@ -125,11 +125,11 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto p-8">
+    <div className="space-y-8 max-w-7xl mx-auto p-8 ">
       <PageHeader
         title="Dashboard"
         description="View your documents and analytics"
-        className="mb-8"
+        className="mb-8  text-blue-600"
       >
         <Button
           onClick={() => navigate("/upload")}
@@ -177,6 +177,17 @@ const Dashboard = () => {
                 className="bg-white rounded-xl p-6 border border-border/40 shadow-sm h-[200px] animate-pulse border-gray-200"
               ></div>
             ))}
+          </div>
+        ) : documents.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-gray-500 mb-4">No recent documents available</p>
+            <Button
+              onClick={() => navigate("/upload")}
+              className="text-blue-600 bg-blue-100 hover:bg-blue-200"
+            >
+              <Plus size={16} className="mr-2" />
+              Upload Your First Document
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

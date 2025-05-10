@@ -1,12 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { RefreshCw, Save } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const SettingsPage = () => {
   const [name, setName] = useState<string>("");
@@ -18,9 +22,9 @@ const SettingsPage = () => {
 
   useEffect(() => {
     // Get user info from localStorage
-    const storedName = localStorage.getItem('currentUserName');
-    const storedEmail = localStorage.getItem('currentUserEmail');
-    
+    const storedName = localStorage.getItem("currentUserName");
+    const storedEmail = localStorage.getItem("currentUserEmail");
+
     if (storedName) setName(storedName);
     if (storedEmail) setEmail(storedEmail);
   }, []);
@@ -28,14 +32,14 @@ const SettingsPage = () => {
   const handleSaveProfile = async () => {
     try {
       setIsLoading(true);
-      
+
       // In a real implementation, you would call an API to update the user profile
       // For now, we'll just update localStorage
-      if (name) localStorage.setItem('currentUserName', name);
-      
+      if (name) localStorage.setItem("currentUserName", name);
+
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       toast({
         title: "Profile Updated",
         description: "Your profile has been updated successfully.",
@@ -45,7 +49,7 @@ const SettingsPage = () => {
       toast({
         title: "Error",
         description: "Failed to update profile. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -58,7 +62,7 @@ const SettingsPage = () => {
       <p className="text-muted-foreground">
         Manage your account settings and preferences.
       </p>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
@@ -76,7 +80,7 @@ const SettingsPage = () => {
               onChange={(e) => setName(e.target.value)}
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -87,10 +91,11 @@ const SettingsPage = () => {
               className="bg-muted"
             />
             <p className="text-xs text-muted-foreground">
-              Email cannot be changed. Contact support if you need to update your email.
+              Email cannot be changed. Contact support if you need to update
+              your email.
             </p>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="phone">Phone Number (Optional)</Label>
             <Input
@@ -100,19 +105,24 @@ const SettingsPage = () => {
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
-          
-          <Button 
-            onClick={handleSaveProfile} 
+
+          <Button
+            onClick={handleSaveProfile}
             disabled={isLoading || !name.trim()}
             className="flex items-center gap-2 mt-2"
           >
-            {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save size={16} />}
+            {isLoading ? (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            ) : (
+              <Save size={16} />
+            )}
             Save Changes
           </Button>
         </CardContent>
       </Card>
-      
-      <Card>
+
+      {/* Notifications */}
+      {/* <Card>
         <CardHeader>
           <CardTitle>Notifications</CardTitle>
           <CardDescription>
@@ -150,9 +160,10 @@ const SettingsPage = () => {
             />
           </div>
         </CardContent>
-      </Card>
-      
-      <Card>
+      </Card> */}
+
+      {/* Delete Account */}
+      {/* <Card>
         <CardHeader>
           <CardTitle>Danger Zone</CardTitle>
           <CardDescription>
@@ -163,14 +174,13 @@ const SettingsPage = () => {
           <div className="space-y-2">
             <h3 className="font-medium">Delete Account</h3>
             <p className="text-sm text-muted-foreground">
-              Permanently delete your account and all associated data. This action cannot be undone.
+              Permanently delete your account and all associated data. This
+              action cannot be undone.
             </p>
-            <Button variant="destructive">
-              Delete Account
-            </Button>
+            <Button variant="destructive">Delete Account</Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 };

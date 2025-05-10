@@ -13,15 +13,20 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "@/lib/router"; // Import our custom router
 import { cn } from "@/lib/utils";
+import { FaXTwitter } from "react-icons/fa6";
+
 import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Github,
   Home,
   Key,
+  Linkedin,
   LogOut,
   Server,
   Settings,
+  Twitter,
   Upload,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -189,6 +194,21 @@ export function Sidebar({ className }: SidebarProps) {
             <Key className={cn("h-5 w-5", expanded ? "mr-2" : "")} />
             {expanded && <span>API Access</span>}
           </Button>
+
+          <Button
+            variant={router.isActive("/settings") ? "secondary" : "ghost"}
+            className={cn(
+              "w-full justify-start mb-4",
+              expanded ? "" : "justify-center",
+              router.isActive("/settings")
+                ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
+                : "hover:bg-primary/5"
+            )}
+            onClick={() => router.push("/settings")}
+          >
+            <Settings className={cn("h-5 w-5", expanded ? "mr-2" : "")} />
+            {expanded && <span>Settings</span>}
+          </Button>
         </nav>
       </div>
 
@@ -252,6 +272,83 @@ export function Sidebar({ className }: SidebarProps) {
             </AlertDialogContent>
           </AlertDialog>
         </div>
+      </div>
+
+      {/* About Developer Box */}
+      <div
+        className={cn(
+          "m-2.5 mb-4 p-3 rounded-lg border border-blue-200 bg-blue-50",
+          !expanded && "p-2"
+        )}
+      >
+        {expanded ? (
+          <>
+            <h3 className="font-medium text-blue-700 mb-2">Developed By</h3>
+            <p className="text-sm text-blue-600 mb-3">Aayush Paigwar</p>
+            <div className="space-y-2">
+              <a
+                href="https://linkedin.com/in/aayush-paigwar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+              >
+                <Linkedin className="h-4 w-4 mr-2" />
+                <span>LinkedIn</span>
+              </a>
+              <a
+                href="https://github.com/aayushpaigwar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+              >
+                <Github className="h-4 w-4 mr-2" />
+                <span>GitHub</span>
+              </a>
+              <a
+                href="https://twitter.com/aayush27_11"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+              >
+                <FaXTwitter className="h-4 w-4 mr-2" />
+
+                <span>Twitter</span>
+              </a>
+              {/* <a
+                href="mailto:aayushpaigwar@gmail.com"
+                className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                <span>Contact</span>
+              </a> */}
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center space-y-2">
+            <Linkedin
+              className="h-5 w-5 text-blue-600 cursor-pointer"
+              onClick={() =>
+                window.open("https://linkedin.com/in/aayush-paigwar", "_blank")
+              }
+            />
+            <Github
+              className="h-5 w-5 text-blue-600 cursor-pointer"
+              onClick={() =>
+                window.open("https://github.com/aayushpaigwar", "_blank")
+              }
+            />
+            <Twitter
+              className="h-5 w-5 text-blue-600 cursor-pointer"
+              onClick={() =>
+                window.open("https://twitter.com/aayush27_11", "_blank")
+              }
+            />
+            {/* <Mail
+              className="h-5 w-5 text-blue-600 cursor-pointer"
+              onClick={() => window.open("mailto:aayushpaigwar@gmail.com")}
+            /> */}
+          </div>
+        )}
       </div>
     </div>
   );

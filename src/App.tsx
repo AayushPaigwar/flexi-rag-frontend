@@ -1,4 +1,3 @@
-
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Toaster } from "@/components/ui/toaster";
@@ -91,12 +90,27 @@ function AppContent({
 
   return (
     <div className="flex h-screen">
-      {isAuthenticated && <Sidebar className="h-screen" />}
-      <main className={`flex-1 overflow-auto ${isAuthenticated ? "ml-0" : ""}`}>
+      {isAuthenticated && location.pathname !== "/" && (
+        <Sidebar className="h-screen" />
+      )}
+      <main
+        className={`flex-1 overflow-auto ${
+          isAuthenticated && location.pathname !== "/" ? "ml-0" : ""
+        }`}
+      >
         <Routes>
           {/* Landing page as the default entry point */}
-          <Route path="/" element={<LandingPage />} />
-          
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <LandingPage />
+              )
+            }
+          />
+
           {/* Login/Create user page */}
           <Route
             path="/login"

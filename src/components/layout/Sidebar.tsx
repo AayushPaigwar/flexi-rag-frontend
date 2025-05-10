@@ -194,21 +194,6 @@ export function Sidebar({ className }: SidebarProps) {
             <Key className={cn("h-5 w-5", expanded ? "mr-2" : "")} />
             {expanded && <span>API Access</span>}
           </Button>
-
-          <Button
-            variant={router.isActive("/settings") ? "secondary" : "ghost"}
-            className={cn(
-              "w-full justify-start mb-4",
-              expanded ? "" : "justify-center",
-              router.isActive("/settings")
-                ? "bg-blue-100 text-blue-600 hover:bg-blue-200"
-                : "hover:bg-primary/5"
-            )}
-            onClick={() => router.push("/settings")}
-          >
-            <Settings className={cn("h-5 w-5", expanded ? "mr-2" : "")} />
-            {expanded && <span>Settings</span>}
-          </Button>
         </nav>
       </div>
 

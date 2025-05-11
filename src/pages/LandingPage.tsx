@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "@/lib/router";
-import { FileText, MessageSquare, Server, Speech } from "lucide-react";
+import { FileText, Github, MessageSquare, Server, Speech } from "lucide-react";
 import { useEffect } from "react";
 
 export default function LandingPage() {
@@ -46,13 +46,27 @@ export default function LandingPage() {
               FAQ
             </a>
           </nav>
-          <Button
-            onClick={() => router.push("/login")}
-            variant="outline"
-            className="hidden sm:inline-flex"
-          >
-            Sign In
-          </Button>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://github.com/aayushpaigwar/flexi-rag-nest"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-md bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition-colors"
+            >
+              <Github className="h-4 w-4" />
+              <span>Star on GitHub</span>
+              {/* <span className="flex items-center justify-center h-5 min-w-[20px] px-1 bg-white text-gray-800 rounded-full text-xs font-semibold">
+                ⭐
+              </span> */}
+            </a>
+            <Button
+              onClick={() => router.push("/login")}
+              variant="outline"
+              className="hidden sm:inline-flex"
+            >
+              Sign In
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -81,7 +95,15 @@ export default function LandingPage() {
                 >
                   Get Started
                 </Button>
-                <Button variant="outline" size="lg" className="text-base">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-base"
+                  onClick={() => {
+                    const element = document.getElementById("how-it-works");
+                    element?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
                   Learn More
                 </Button>
               </div>

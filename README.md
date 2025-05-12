@@ -133,8 +133,7 @@ This project is licensed under the MIT License.
 
 ## 🔗 Links
 
-* [Backend API](https://github.com/aayushpaigwar/flexi-rag-backend)
-* [API Documentation](https://flexi-rag.azurewebsites.net/docs)
+* [Deployed Link](https://flexirag.vercel.app)
 
 ---
 

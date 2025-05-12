@@ -1,3 +1,37 @@
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/92d92469-4bb3-4698-9db0-3b0bbe8718a1" alt="FlexiRAG Logo" width="200" height="200" />
+</p>
+<p align="center">
+  <a href="https://flexirag.vercel.app/" target="_blank"><strong>FlexiRAG - Flexible Retrieval Augmented Generation </strong></a>
+</p>
+
+<p align="center">
+
+  <!-- First Line: Deployment + GitHub -->
+  <a href="https://vercel.com/aayushpaigwar/flexi-rag-frontend">
+    <img src="https://vercelbadge.vercel.app/api/aayushpaigwar/flexi-rag-frontend" alt="Vercel" />
+  </a>
+  <img src="https://img.shields.io/github/stars/AayushPaigwar/flexi-rag-frontend?style=social" alt="GitHub Repo stars" />
+
+</p>
+
+<p align="center">
+
+  <!-- Second Line: Tech Stack -->
+  <img src="https://img.shields.io/badge/Frontend-React-blue?logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/Build-Vite-purple?logo=vite" alt="Vite" />
+  <img src="https://img.shields.io/badge/Styling-TailwindCSS-38B2AC?logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Language-Python-3776AB?logo=python&logoColor=white" alt="Python" />
+
+</p>
+
+
+
+
+
+
+
 # FlexiRAG - Flexible Retrieval Augmented Generation
 
 FlexiRAG is a powerful document RAG (Retrieval Augmented Generation) platform that allows you to upload, deploy, and query documents through an intuitive interface and API.

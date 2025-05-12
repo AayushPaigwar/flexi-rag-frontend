@@ -8,7 +8,7 @@
 <p align="center">
 
   <!-- First Line: Deployment + GitHub -->
-  <a href="https://vercel.com/aayushpaigwar/flexi-rag-frontend">
+  <a href="https://flexirag.vercel.app/">
     <img src="https://vercelbadge.vercel.app/api/aayushpaigwar/flexi-rag-frontend" alt="Vercel" />
   </a>
   <img src="https://img.shields.io/github/stars/AayushPaigwar/flexi-rag-frontend?style=social" alt="GitHub Repo stars" />

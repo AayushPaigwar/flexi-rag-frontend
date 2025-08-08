@@ -198,7 +198,7 @@ const ApiPage = () => {
           <div className="bg-muted p-4 rounded-md overflow-x-auto">
             <pre className="text-sm">
               {`// Example using fetch
-fetch("https://flexi-rag.azurewebsites.net/api/v1/deployed/{document_id}", {
+fetch("https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net//api/v1/deployed/{document_id}", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",

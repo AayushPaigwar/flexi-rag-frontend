@@ -1,7 +1,7 @@
 /**
  * API Service for communicating with the FlexiRAG backend
  */
-const API_BASE_URL = 'https://flexi-rag.azurewebsites.net/api/v1';
+const API_BASE_URL = 'https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net//api/v1';
 // export const API_BASE_URL = 'http://localhost:8000/api/v1';
 
 const handleApiError = async (response: Response) => {

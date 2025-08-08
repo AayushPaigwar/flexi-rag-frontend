@@ -4,7 +4,7 @@ import { AuthResponse, VerifyOtpResponse } from './types/auth.types';
 export class AuthService {
 
   // TODO: chnage the API URL to the correct one
-  private readonly API_URL = 'https://flexi-rag.azurewebsites.net/api/v1';
+  private readonly API_URL = 'https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net//api/v1';
   // private readonly API_URL = 'http://localhost:8000/api/v1';
 
   /**

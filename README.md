@@ -133,7 +133,7 @@ The API documentation is available at:
 Once you've deployed a document, you can query it using the provided endpoint:
 
 ```http
-POST https://flexi-rag.azurewebsites.net/api/v1/deployed/{document_id}
+POST https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net//api/v1/deployed/{document_id}
 Content-Type: application/json
 
 {

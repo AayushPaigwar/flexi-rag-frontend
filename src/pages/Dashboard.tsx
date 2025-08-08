@@ -28,7 +28,7 @@ const Dashboard = () => {
       try {
         setIsLoading(true);
         const response = await fetch(
-          `https://flexi-rag.azurewebsites.net/api/v1/users/${userId}/documents`
+          `https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net//api/v1/users/${userId}/documents`
         );
 
         if (!response.ok) {
@@ -60,7 +60,7 @@ const Dashboard = () => {
     const fetchDeployedApis = async () => {
       try {
         const response = await fetch(
-          "https://flexi-rag.azurewebsites.net/api/v1/documents/deployed",
+          "https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net//api/v1/documents/deployed",
           {
             method: "POST",
             headers: {

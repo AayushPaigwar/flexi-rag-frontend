@@ -140,8 +140,8 @@ const DeploymentsPage = () => {
       return endpoint;
     }
     return endpoint.replace(
-      "https://flexi-rag.azurewebsites.net/",
-      "https://flexi-rag.azurewebsites.net/api/v1/"
+      "https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net//",
+      "https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net//api/v1/"
     );
   };
 

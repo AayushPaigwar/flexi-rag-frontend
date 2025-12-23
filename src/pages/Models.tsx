@@ -7,34 +7,18 @@ import { Button } from '@/components/ui/button';
 import { 
   Plus, 
   Search,
-  SlidersHorizontal,
   Grid,
   List
 } from 'lucide-react';
-import { mockModels, mockCurrentUser } from '@/data/mock-data';
+import { mockCurrentUser } from '@/data/mock-data';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useToast } from '@/hooks/use-toast';
 
 type ViewMode = 'grid' | 'list';
-type SortBy = 'recent' | 'name' | 'status';
-type FilterStatus = 'all' | 'deployed' | 'training' | 'draft';
 
 const Models = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
-  const [sortBy, setSortBy] = useState<SortBy>('recent');
-  const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
   
   const handleCreateModel = () => {
@@ -45,38 +29,41 @@ const Models = () => {
     navigate(`/chat/${document_id}`);
   };
   
-  const handleEditModel = (id: string, document_id: string) => {
+  const handleOpenModel = (id: string, document_id: string) => {
     navigate(`/models/${document_id}`);
   };
   
-  const handleDeleteModel = (id: string, document_id: string) => {
-    // In real implementation, this would call DELETE /documents/{document_id}
-    toast({
-      title: "Document deleted",
-      description: "The RAG model and associated document have been deleted successfully.",
-    });
-  };
-  
-  // Filter and sort the models
+  // Mock models data for display
+  const mockModels = [
+    {
+      id: '1',
+      document_id: 'doc-1',
+      file_name: 'Product Documentation.pdf',
+      file_type: 'application/pdf',
+      createdAt: '2024-01-15',
+    },
+    {
+      id: '2',
+      document_id: 'doc-2',
+      file_name: 'Technical Specs.docx',
+      file_type: 'application/docx',
+      createdAt: '2024-01-20',
+    },
+    {
+      id: '3',
+      document_id: 'doc-3',
+      file_name: 'User Manual.pdf',
+      file_type: 'application/pdf',
+      createdAt: '2024-01-25',
+    },
+  ];
+
+  // Filter models based on search query
   const filteredModels = mockModels.filter((model) => {
-    if (filterStatus !== 'all' && model.status !== filterStatus) {
-      return false;
-    }
-    
     if (searchQuery) {
-      return model.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-             model.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return model.file_name.toLowerCase().includes(searchQuery.toLowerCase());
     }
-    
     return true;
-  }).sort((a, b) => {
-    if (sortBy === 'name') {
-      return a.name.localeCompare(b.name);
-    } else if (sortBy === 'status') {
-      return a.status.localeCompare(b.status);
-    }
-    // Default: recent
-    return 0; // In a real app, would compare timestamps
   });
 
   return (
@@ -102,33 +89,6 @@ const Models = () => {
           />
         </div>
         <div className="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex gap-2">
-                <SlidersHorizontal size={16} />
-                <span className="hidden sm:inline">Filter</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Filter By Status</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup value={filterStatus} onValueChange={(v) => setFilterStatus(v as FilterStatus)}>
-                <DropdownMenuRadioItem value="all">All Models</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="deployed">Deployed</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="training">Training</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="draft">Drafts</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-              
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>Sort By</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup value={sortBy} onValueChange={(v) => setSortBy(v as SortBy)}>
-                <DropdownMenuRadioItem value="recent">Most Recent</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="name">Name (A-Z)</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="status">Status</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
           
           <Button
             variant={viewMode === 'grid' ? 'default' : 'outline'}
@@ -168,11 +128,14 @@ const Models = () => {
           {filteredModels.map((model) => (
             <ModelCard 
               key={model.id}
-              {...model}
+              id={model.id}
+              document_id={model.document_id}
+              file_name={model.file_name}
+              file_type={model.file_type}
+              createdAt={model.createdAt}
               className={viewMode === 'list' ? "!p-4" : ""}
               onChat={handleChatWithModel}
-              onEdit={handleEditModel}
-              onDelete={handleDeleteModel}
+              onOpen={handleOpenModel}
             />
           ))}
         </div>

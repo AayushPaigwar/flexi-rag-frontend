@@ -1,12 +1,12 @@
 /**
  * API Service for communicating with the FlexiRAG backend
  */
-const API_BASE_URL = 'https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net//api/v1';
+const API_BASE_URL = "https://flexirag-cqdrbdcvc0gfhxbg.canadacentral-01.azurewebsites.net/api/v1";
 // export const API_BASE_URL = 'http://localhost:8000/api/v1';
 
 const handleApiError = async (response: Response) => {
   if (!response.ok) {
-    let errorMessage = 'API request failed';
+    let errorMessage = "API request failed";
     try {
       const errorData = await response.json();
       errorMessage = errorData.message || errorData.detail || `Error: ${response.status} ${response.statusText}`;
@@ -23,14 +23,14 @@ const handleApiError = async (response: Response) => {
 // User API
 export const signInWithOtp = async (email: string) => {
   try {
-    if (!email || !email.includes('@')) {
+    if (!email || !email.includes("@")) {
       throw new Error("Invalid email address provided.");
     }
 
     const response = await fetch(`${API_BASE_URL}/users/signin-otp/`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
     });
@@ -42,17 +42,12 @@ export const signInWithOtp = async (email: string) => {
   }
 };
 
-export const verifyOtp = async (data: { 
-  email: string; 
-  token: string; 
-  name?: string;
-  phone_number?: string;
-}) => {
+export const verifyOtp = async (data: { email: string; token: string; name?: string; phone_number?: string }) => {
   try {
     const response = await fetch(`${API_BASE_URL}/users/verify-otp/`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
@@ -68,7 +63,7 @@ export const verifyOtp = async (data: {
 // export const logoutUser = async (email: string) => {
 //   try {
 //     console.log("Logging out user:", email);
-    
+
 //     const response = await fetch(`${API_BASE_URL}/users/logout/`, {
 //       method: 'POST',
 //       headers: {
@@ -76,7 +71,7 @@ export const verifyOtp = async (data: {
 //       },
 //       body: JSON.stringify({ email }),
 //     });
-    
+
 //     return handleApiError(response);
 //   } catch (error) {
 //     console.error("Logout user error:", error);
@@ -98,10 +93,10 @@ export const getUserDocuments = async (userId: string) => {
 export const uploadDocument = async (file: File, userId: string) => {
   try {
     const formData = new FormData();
-    formData.append('file', file);
-    
+    formData.append("file", file);
+
     const response = await fetch(`${API_BASE_URL}/documents/upload/?user_id=${userId}`, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     });
     return handleApiError(response);
@@ -114,9 +109,9 @@ export const uploadDocument = async (file: File, userId: string) => {
 export const queryDocument = async (documentId: string, query: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/query/`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         document_id: documentId,
@@ -134,9 +129,9 @@ export const queryDocument = async (documentId: string, query: string) => {
 export const deployDocument = async (documentId: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/documents/${documentId}/deploy`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
     return handleApiError(response);
@@ -152,11 +147,11 @@ export const queryDeployedDocument = async (documentId: string, query: string, a
     if (apiKey) {
       body.api_key = apiKey;
     }
-    
+
     const response = await fetch(`${API_BASE_URL}/deployed/${documentId}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
     });
@@ -171,9 +166,9 @@ export const queryDeployedDocument = async (documentId: string, query: string, a
 export const addGeminiApiKey = async (userId: string, apiKey: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/keys`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         user_id: userId,
@@ -224,11 +219,11 @@ export interface DeploymentResponse {
 export const getDeployedDocuments = async (userId: string) => {
   try {
     console.log("Fetching deployed documents for user:", userId);
-    
+
     const response = await fetch(`${API_BASE_URL}/documents/deployed`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ user_id: userId }),
     });
@@ -245,9 +240,9 @@ export const getDeployedDocuments = async (userId: string) => {
 export const getAvailableDocuments = async (userId: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/documents/available`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ user_id: userId }),
     });
@@ -267,19 +262,18 @@ interface GeminiKeyResponse {
 
 // Add this function
 export const getGeminiApiKey = async (userId: string): Promise<GeminiKeyResponse> => {
-
   console.log("getGeminiApiKey Userid :", userId);
   const response = await fetch(`${API_BASE_URL}/keys/get`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ user_id: userId }),
   });
-  
+
   if (!response.ok) {
-    throw new Error('Failed to fetch API key');
+    throw new Error("Failed to fetch API key");
   }
-  
+
   return response.json();
 };
